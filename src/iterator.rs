@@ -1,20 +1,24 @@
-use super::CyclicList;
+use std::marker::PhantomData;
 
-pub struct ListIter<'a, const SIZE: usize, T: Sized, const WRITEOVER: bool> {
+use crate::list::List;
+
+pub struct ListIter<'a, T, L> where L: 'a + List<T> {
     pointer: usize,
-    list: &'a CyclicList<SIZE, T, WRITEOVER>,
+    list: L,
+    phantom: PhantomData<&'a T>,
 }
 
-impl<'a, const SIZE: usize, T: Sized, const WRITEOVER: bool> ListIter<'a, SIZE, T, WRITEOVER> {
-    pub fn new(list: &'a CyclicList<SIZE, T, WRITEOVER>) -> Self {
+impl<'a, T, L> ListIter<'a, T, L> where L: 'a + List<T> {
+    pub fn new(list: L) -> Self {
         Self {
             pointer: 0,
-            list: list
+            list: list,
+            phantom: PhantomData,
         }
     }
 }
 
-impl<'a, const SIZE: usize, T: Sized, const WRITEOVER: bool> Iterator for ListIter<'a, SIZE, T, WRITEOVER> {
+impl<'a, T, L> Iterator for ListIter<'a, T, L> where L: 'a + List<T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -27,7 +31,7 @@ impl<'a, const SIZE: usize, T: Sized, const WRITEOVER: bool> Iterator for ListIt
     }
 }
 
-impl<'a, const SIZE: usize, T: Sized, const WRITEOVER: bool> ExactSizeIterator for ListIter<'a, SIZE, T, WRITEOVER> {
+impl<'a, T, L> ExactSizeIterator for ListIter<'a, T, L> where L: 'a + List<T> {
     fn len(&self) -> usize {
         self.list.len() - self.pointer
     }

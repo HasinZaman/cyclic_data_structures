@@ -1,8 +1,11 @@
 use std::{array, mem::{MaybeUninit, self}, ptr, ops::{Index, IndexMut}, fmt::{Display, Debug}};
 
-use self::iterator::ListIter;
+use iterator::ListIter;
+use list::List;
 
 pub mod iterator;
+mod list;
+
 #[cfg(test)]
 mod tests;
 
@@ -48,7 +51,31 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         }
     }
 
-    pub fn len(&self) -> usize {
+    // fn iter(&self) -> ListIter<'_, T, &Self> {
+    //     ListIter::new(self)
+    // }
+
+    // fn iter_mut(&mut self) -> ListIter<T, &mut Self> {
+    //     ListIter::new(self)
+    // }
+
+    fn increment_start(&self) -> usize {
+        (self.start+1)%SIZE
+    }
+    
+    fn increment_end(&self) -> usize {
+        (self.end+1)%SIZE
+    }
+    fn decrement_end(&self) -> usize {
+        if let Some(val) = self.end.checked_sub(1) {
+            return val
+        }
+        SIZE-1
+    }
+}
+
+impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T, WRITEOVER> {
+    fn len(&self) -> usize {
         if self.end < self.start {
             return SIZE - self.start + self.end
         }
@@ -56,7 +83,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         self.end - self.start
     }
 
-    pub fn push(&mut self, elem: T) -> Result<&Self, Error> {
+    fn push(&mut self, elem: T) -> Result<&Self, Error> {
         if self.len() == SIZE && !WRITEOVER {
             return Err(Error::Overflow)
         }
@@ -83,7 +110,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         Ok(self)
     }
 
-    pub fn get(&self, index: usize) -> Result<&T, Error> {
+    fn get(&self, index: usize) -> Result<&T, Error> {
         if self.len() <= index{
             return Err(Error::IndexOutOfRange)
         }
@@ -91,7 +118,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         Ok(&self.list[(self.start + index) % SIZE])
     }
 
-    pub fn get_mut(&mut self, index: usize) -> Result<&mut T, Error> {
+    fn get_mut(&mut self, index: usize) -> Result<&mut T, Error> {
         if self.len() <= index{
             return Err(Error::IndexOutOfRange)
         }
@@ -99,7 +126,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         Ok(&mut self.list[(self.start + index) % SIZE])
     }
 
-    pub fn pop(&mut self) -> Option<&mut T> {
+    fn pop(&mut self) -> Option<&mut T> {
         if self.len() == 0 {
             return None
         }
@@ -109,25 +136,8 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
 
         Some(&mut self.list[pop_index])
     }
-
-    pub fn iter(&self) -> ListIter<SIZE, T, WRITEOVER> {
-        ListIter::new(&self)
-    }
-
-    fn increment_start(&self) -> usize {
-        (self.start+1)%SIZE
-    }
-    
-    fn increment_end(&self) -> usize {
-        (self.end+1)%SIZE
-    }
-    fn decrement_end(&self) -> usize {
-        if let Some(val) = self.end.checked_sub(1) {
-            return val
-        }
-        SIZE-1
-    }
 }
+
 
 impl<const SIZE: usize, T, const WRITEOVER: bool> Display for CyclicList<SIZE, T, WRITEOVER> where T: Display{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -176,15 +186,5 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> IndexMut<usize> for CyclicList
         }
 
         &mut self.list[(self.start + index) % SIZE]
-    }
-}
-
-impl<'a, const SIZE: usize, T, const WRITEOVER: bool> IntoIterator for &'a CyclicList<SIZE, T, WRITEOVER> {
-    type Item = &'a T;
-
-    type IntoIter = ListIter<'a, SIZE, T, WRITEOVER>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        ListIter::new(self)
     }
 }
