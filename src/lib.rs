@@ -146,19 +146,10 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
         if self.len() == SIZE && !WRITEOVER {
             return Err(Error::Overflow)
         }
-
-        if self.len() == 0 {
-            self.list[self.end] = elem;
-
-            self.end = self.increment_end();
-
-            return Ok(self)
-        }
-        
         
         //pushing new value
         self.list[self.end] = elem;
-        
+
         self.end = self.increment_end();
 
         //if end pointer loops over to start pointer
