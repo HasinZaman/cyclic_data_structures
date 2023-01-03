@@ -196,6 +196,32 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
         Some(&mut self.list[pop_index])
     }
 
+    fn remove_at(&mut self, elem: T, index: usize) -> Result<Option<T>, Error> where T: Clone {
+        if self.len() < index  {
+            return Err(Error::IndexOutOfRange)
+        }
+
+        if self.len() == 0 {
+            return Ok(None);
+        }
+
+        let val = Some(self[index].clone());
+
+        if index == 0 {
+            self.start = self.increment_start();
+
+            return Ok(val)
+        }
+        
+        for i in index..(self.len()-1) {
+            self.list[i] = self.list[i+1].clone();
+        }
+
+        self.end = self.increment_end();
+
+        Ok(val)
+    }
+
     fn iter(&self) -> ListIter<T, Self> where Self: Sized {
         ListIter::new(self)
     }
@@ -203,7 +229,6 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
     fn iter_mut(&mut self) -> ListIter<T, Self> where Self: Sized {
         ListIter::new(self)
     }
-
     
 }
 
