@@ -4,7 +4,7 @@ use iterator::ListIter;
 use list::List;
 
 pub mod iterator;
-mod list;
+pub mod list;
 
 #[cfg(test)]
 mod tests;
