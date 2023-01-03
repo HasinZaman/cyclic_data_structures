@@ -66,6 +66,21 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
     }
 }
 
+impl<const SIZE: usize, T, const WRITEOVER: bool> PartialEq for CyclicList<SIZE, T, WRITEOVER> where T: PartialEq {
+    fn eq(&self, other: &Self) -> bool {
+
+        if self.len() != other.len() {
+            return false;
+        }
+
+        let tmp = self.iter()
+            .zip(other.iter())
+            .all(|(l1, l2)| l1 == l2);
+
+        return tmp;
+    }
+}
+
 impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T, WRITEOVER> {
     fn len(&self) -> usize {
         if self.end < self.start {
