@@ -51,14 +51,6 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         }
     }
 
-    // fn iter(&self) -> ListIter<'_, T, &Self> {
-    //     ListIter::new(self)
-    // }
-
-    // fn iter_mut(&mut self) -> ListIter<T, &mut Self> {
-    //     ListIter::new(self)
-    // }
-
     fn increment_start(&self) -> usize {
         (self.start+1)%SIZE
     }
@@ -136,12 +128,19 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
 
         Some(&mut self.list[pop_index])
     }
-}
 
+    fn iter(&self) -> ListIter<T, Self> where Self: Sized {
+        ListIter::new(self)
+    }
+
+    fn iter_mut(&mut self) -> ListIter<T, Self> where Self: Sized {
+        ListIter::new(self)
+    }
+}
 
 impl<const SIZE: usize, T, const WRITEOVER: bool> Display for CyclicList<SIZE, T, WRITEOVER> where T: Display{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let iter = (&self).into_iter();
+        let iter = (&self).iter();
 
         let tmp = iter.fold(String::from(""), |acc, val| format!("{},{}", acc, val));
 
