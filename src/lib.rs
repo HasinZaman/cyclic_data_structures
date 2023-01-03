@@ -55,7 +55,15 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
     fn increment_start(&self) -> usize {
         (self.start+1)%SIZE
     }
-    
+    fn decrement_start(&self) -> usize {
+        if let Some(val) = self.start.checked_sub(1) {
+            return val
+        }
+        SIZE-1
+    }
+
+
+
     fn increment_end(&self) -> usize {
         (self.end+1)%SIZE
     }
@@ -89,6 +97,49 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
         }
 
         self.end - self.start
+    }
+
+    fn insert_at(&mut self, elem: T, index: usize) -> Result<&Self, Error> where T: Clone {
+        //todo implement push from beginning and end
+        if self.len()+1 <= SIZE && WRITEOVER {
+            return Err(Error::Overflow)
+        }
+
+        if self.len() < index  {
+            return Err(Error::IndexOutOfRange)
+        }
+
+        if self.len() == index {
+            return self.push(elem);
+        }
+
+        if index == 0 {
+            self.start = self.decrement_start();
+
+            if self.start == self.end {
+                self.end = self.decrement_end();
+            }
+
+            self.list[self.start] = elem;
+
+            return Ok(self)
+        }
+
+        self.end = self.increment_end();
+
+        if self.start == self.end {
+            self.start = self.increment_start();
+        }
+
+        //shift everything from index to end
+        for i in (index..self.len()).rev() {
+            self.list[i] = self.list[i-1].clone();
+        }
+
+        //adding value at index
+        self.list[index] = elem;
+
+        Ok(self)
     }
 
     fn push(&mut self, elem: T) -> Result<&Self, Error> {
@@ -152,6 +203,8 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
     fn iter_mut(&mut self) -> ListIter<T, Self> where Self: Sized {
         ListIter::new(self)
     }
+
+    
 }
 
 impl<const SIZE: usize, T, const WRITEOVER: bool> Display for CyclicList<SIZE, T, WRITEOVER> where T: Display{

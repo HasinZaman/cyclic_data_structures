@@ -3,6 +3,7 @@ use crate::{iterator::{ListIter}, Error};
 
 pub trait List<T>{
     fn len(&self) -> usize;
+    fn insert_at(&mut self, elem: T, index: usize) -> Result<&Self, Error> where T: Clone;
     fn push(&mut self, elem: T) -> Result<&Self, Error>;
     fn get(&self, index: usize) -> Result<&T, Error>;
     fn get_mut(&mut self, index: usize) -> Result<&mut T, Error>;
