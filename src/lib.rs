@@ -155,10 +155,11 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
             return Ok(self)
         }
         
-        self.end = self.increment_end();
         
         //pushing new value
         self.list[self.end] = elem;
+        
+        self.end = self.increment_end();
 
         //if end pointer loops over to start pointer
         if self.start == self.end {
