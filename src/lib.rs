@@ -12,7 +12,8 @@ mod tests;
 #[derive(Debug)]
 pub enum Error{
     IndexOutOfRange,
-    Overflow
+    Overflow,
+    InvalidSize
 }
 
 #[derive(Clone)]
@@ -200,5 +201,51 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> IndexMut<usize> for CyclicList
         }
 
         &mut self.list[(self.start + index) % SIZE]
+    }
+}
+
+impl <const SIZE: usize, T, const WRITEOVER: bool> TryFrom<Vec<T>>  for CyclicList<SIZE, T, WRITEOVER> where T: Default{
+    type Error = Error;
+
+    fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
+        if SIZE < value.len() {
+            return Err(Error::InvalidSize)
+        }
+
+        let mut list: CyclicList<SIZE, T, WRITEOVER> = CyclicList::default();
+
+        for val in value {
+            if let Err(err) = list.push(val) {
+                return Err(err)
+            }
+        }
+
+        Ok(list)
+    }
+}
+
+impl <const ARRAY_SIZE: usize, const LIST_SIZE: usize, T, const WRITEOVER: bool> From<[T; ARRAY_SIZE]> for CyclicList<LIST_SIZE, T, WRITEOVER> where T: Default + Clone{
+    fn from(value: [T; ARRAY_SIZE]) -> Self {
+        if LIST_SIZE < ARRAY_SIZE {
+            panic!("Array size is larger than max cyclic list size")
+        }
+
+        let mut list = Self::default();
+
+        for i in 0..value.len() {
+            list[i] = value[i].clone();
+        }
+        list.end = value.len();
+
+        list
+    }
+}
+
+impl<const SIZE: usize, T, const WRITEOVER: bool> Into<Vec<T>> for CyclicList<SIZE, T, WRITEOVER> where T: Clone{
+    fn into(self) -> Vec<T> {
+
+        self.iter()
+            .map(|val| val.clone())
+            .collect()
     }
 }
