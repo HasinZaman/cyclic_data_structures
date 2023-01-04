@@ -110,8 +110,88 @@ mod pop{
     }
 }
 
+mod remove_front {
+    use crate::{CyclicList, list::List};
 
-// remove_at
+    #[test]
+    fn empty_remove_front() {
+        let mut list: CyclicList<5, i64, false> = CyclicList::default();
+        
+        let val = list.remove_front();
+
+        assert_eq!(val, None);
+        assert_eq!(list.len(), 0);
+    }
+
+    #[test]
+    fn remove_front_one() {
+        let mut list: CyclicList<5, i64, false> = CyclicList::try_from(vec![1]).unwrap();
+        
+        let val = list.remove_front();
+        assert_eq!(val, Some(&mut 1));
+
+        assert_eq!(list.len(), 0);
+    }
+
+    #[test]
+    fn remove_front_serial() {
+        let mut list: CyclicList<5, i64, false> = CyclicList::try_from(vec![1,2,3,4,5]).unwrap();
+        
+        for i in 1..=5{
+            let mut expected = i;
+
+            let val = list.remove_front();
+            assert_eq!(val, Some(&mut expected));
+
+            assert_eq!(list.len(), 5 - i as usize);
+        }
+        
+        assert_eq!(list.len(), 0);
+    }
+
+    #[test]
+    fn remove_front_from_overflow() {
+        let mut list: CyclicList<5, i64, true> = CyclicList::default();
+
+        for i in 1..=7{
+            list.push(i).unwrap();
+        }
+
+        let mut size = 5;
+        for i in 3..=7 {
+            size -= 1;
+            
+            let mut expected = i;
+
+            let val = list.remove_front();
+            assert_eq!(val, Some(&mut expected));
+
+            assert_eq!(list.len(), size);
+        }
+        
+        assert_eq!(list.len(), 0);
+    }
+}
+
+
+// mod remove_at{
+//     use crate::{CyclicList, List, Error};
+
+//     #[test]
+//     fn empty_list() {
+//         let mut list: CyclicList<5, i64, false> = CyclicList::default();
+        
+//         assert_eq!(list.remove_at(0), Err(Error::IndexOutOfRange));
+//     }
+
+//     #[test]
+//     fn remove_at_start() {
+//         let mut list: CyclicList<5, i64, false> = CyclicList::default();
+        
+//         assert_eq!(list.remove_at(0), Err(Error::IndexOutOfRange));
+//     }
+
+// }
 
 mod iter{
     use crate::{CyclicList, list::List};
