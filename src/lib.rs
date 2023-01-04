@@ -9,7 +9,7 @@ pub mod list;
 #[cfg(test)]
 mod tests;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Error{
     IndexOutOfRange,
     Overflow,
@@ -21,7 +21,7 @@ pub struct CyclicList<const SIZE: usize, T: Sized, const WRITEOVER: bool>{
     list: [T; SIZE],
     start: usize,
     end: usize,
-
+    empty: bool,
 }
 
 impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER> {
@@ -48,7 +48,8 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         Self {
             list,
             start: 0,
-            end: 0
+            end: 0,
+            empty: true,
         }
     }
 
@@ -78,13 +79,16 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
 impl<const SIZE: usize, T, const WRITEOVER: bool> PartialEq for CyclicList<SIZE, T, WRITEOVER> where T: PartialEq {
     fn eq(&self, other: &Self) -> bool {
 
+        
         if self.len() != other.len() {
             return false;
         }
 
         let tmp = self.iter()
             .zip(other.iter())
-            .all(|(l1, l2)| l1 == l2);
+            .all(|(l1, l2)| {
+                l1 == l2
+            });
 
         return tmp;
     }
@@ -92,14 +96,18 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> PartialEq for CyclicList<SIZE,
 
 impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T, WRITEOVER> {
     fn len(&self) -> usize {
-        if self.end < self.start {
-            return SIZE - self.start + self.end
+        if self.empty {
+            return 0;
         }
 
-        self.end - self.start
+        if self.end < self.start {
+            return SIZE - self.start + self.end + 1
+        }
+
+        self.end - self.start + 1
     }
 
-    fn insert_at(&mut self, elem: T, index: usize) -> Result<&Self, Error> where T: Clone {
+    fn insert_at(&mut self, elem: T, index: usize) -> Result<&mut Self, Error> where T: Clone {
         //todo implement push from beginning and end
         if self.len()+1 <= SIZE && WRITEOVER {
             return Err(Error::Overflow)
@@ -142,21 +150,34 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
         Ok(self)
     }
 
-    fn push(&mut self, elem: T) -> Result<&Self, Error> {
-        if self.len() == SIZE && !WRITEOVER {
+    fn push(&mut self, elem: T) -> Result<&mut Self, Error> {
+        if self.len() + 1 > SIZE && !WRITEOVER {
             return Err(Error::Overflow)
+        }
+
+        match (self.len(), self.empty) {
+            (0, true) => {
+                self.empty = false;
+            },
+            (_val, true) => {
+                panic!("How did i break the list");
+            }
+            _ => {
+                self.end = self.increment_end();
+
+                //if end pointer loops over to start pointer
+                if self.start == self.end {
+                    //dropping first value & incrementing start pointer
+                    self.start = self.increment_start();
+                }
+            },
         }
         
         //pushing new value
         self.list[self.end] = elem;
 
-        self.end = self.increment_end();
 
-        //if end pointer loops over to start pointer
-        if self.start == self.end {
-            //dropping first value & incrementing start pointer
-            self.start = self.increment_start();
-        }
+        
 
         Ok(self)
     }
@@ -183,12 +204,18 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T
         }
         let pop_index = self.end;
 
-        self.end = self.decrement_end();
+        if self.end != self.start {
+            self.end = self.decrement_end();
+        }
+        else {
+            self.empty = true;
+        }
+        
 
         Some(&mut self.list[pop_index])
     }
 
-    fn remove_at(&mut self, elem: T, index: usize) -> Result<Option<T>, Error> where T: Clone {
+    fn remove_at(&mut self, index: usize) -> Result<Option<T>, Error> where T: Clone {
         if self.len() < index  {
             return Err(Error::IndexOutOfRange)
         }
@@ -247,7 +274,8 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> Default for CyclicList<SIZE, T
         Self {
             list,
             start: 0,
-            end: 0
+            end: 0,
+            empty: true
         }
     }
 }
@@ -294,22 +322,18 @@ impl <const SIZE: usize, T, const WRITEOVER: bool> TryFrom<Vec<T>>  for CyclicLi
     }
 }
 
-impl <const ARRAY_SIZE: usize, const LIST_SIZE: usize, T, const WRITEOVER: bool> From<[T; ARRAY_SIZE]> for CyclicList<LIST_SIZE, T, WRITEOVER> where T: Default + Clone{
-    fn from(value: [T; ARRAY_SIZE]) -> Self {
-        if LIST_SIZE < ARRAY_SIZE {
-            panic!("Array size is larger than max cyclic list size")
-        }
-
+impl <const SIZE: usize, T, const WRITEOVER: bool> From<[T; SIZE]> for CyclicList<SIZE, T, WRITEOVER> where T: Default + Clone{
+    fn from(value: [T; SIZE]) -> Self {
         let mut list = Self::default();
 
         for i in 0..value.len() {
-            list[i] = value[i].clone();
+            let _ =list.push(value[i].clone());
         }
-        list.end = value.len();
 
         list
     }
 }
+
 
 impl<const SIZE: usize, T, const WRITEOVER: bool> Into<Vec<T>> for CyclicList<SIZE, T, WRITEOVER> where T: Clone{
     fn into(self) -> Vec<T> {
