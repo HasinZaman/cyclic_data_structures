@@ -278,7 +278,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> Display for CyclicList<SIZE, T
 
 impl<const SIZE: usize, T, const WRITEOVER: bool> Debug for CyclicList<SIZE, T, WRITEOVER> where T: Debug{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("CyclicList").field("list", &self.list).field("start", &self.start).field("end", &self.end).finish()
+        f.debug_struct("CyclicList").field("list", &self.list).field("start", &self.start).field("end", &self.end).field("size", &self.len()).finish()
     }
 }
 
