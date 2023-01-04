@@ -1,7 +1,7 @@
 use std::{array, mem::{MaybeUninit, self}, ptr, ops::{Index, IndexMut}, fmt::{Display, Debug}};
 
-use iterator::ListIter;
-use list::List;
+pub use iterator::ListIter;
+pub use list::List;
 
 pub mod iterator;
 pub mod list;
