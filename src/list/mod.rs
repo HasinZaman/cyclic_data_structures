@@ -102,7 +102,11 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         Ok(self)
     }
 
-    pub fn get(&self, index: isize) -> &T {
+    pub fn get(&self, index: isize) -> Option<&T> {
+        if self.len() == 0 {
+            return None
+        }
+
         let list_index : usize;
 
         let len = self.len() as isize;
@@ -113,14 +117,17 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             list_index = (index % len).try_into().unwrap();
         }
 
-        &self.list[list_index]
+        Some(&self.list[list_index])
     }
 
     pub unsafe fn get_unchecked(&self, index: usize) -> &T {
         todo!()
     }
 
-    pub fn get_mut(&mut self, index: isize) -> &mut T {
+    pub fn get_mut(&mut self, index: isize) -> Option<&mut T> {
+        if self.len() == 0 {
+            return None
+        }
         let list_index : usize;
 
         let len = self.len() as isize;
@@ -132,7 +139,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             list_index = (index % len).try_into().unwrap();
         }
 
-        &mut self.list[list_index]
+        Some(&mut self.list[list_index])
     }
 
     pub unsafe fn get_unchecked_mut(&mut self, index: usize) -> &T {

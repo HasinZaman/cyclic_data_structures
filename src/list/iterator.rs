@@ -23,7 +23,7 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> Iterator for Iter<'a, SIZ
             return None;
         }
 
-        let tmp = Some(self.list.get(self.pointer as isize));
+        let tmp = self.list.get(self.pointer as isize);
 
         self.pointer+=1;
 
