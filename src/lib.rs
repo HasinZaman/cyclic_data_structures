@@ -1,31 +1,28 @@
 use std::{array, mem::{MaybeUninit, self}, ptr, ops::{Index, IndexMut}, fmt::{Display, Debug}};
 
-pub use iterator::ListIter;
-pub use list::List;
+use crate::error::Error;
 
-pub mod iterator;
 pub mod list;
+pub mod error;
 
-#[cfg(test)]
-mod tests;
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum Error{
-    IndexOutOfRange,
-    Overflow,
-    InvalidSize
+#[derive(Clone, Eq)]
+pub(crate) struct CyclicList<const SIZE: usize, T: Sized, const WRITE_OVER: bool>{
+    pub list: [T; SIZE],
+    pub(crate) start: usize,
+    pub(crate) end: usize,
+    pub(crate) empty: bool,
 }
 
-#[derive(Clone)]
-pub struct CyclicList<const SIZE: usize, T: Sized, const WRITEOVER: bool>{
-    list: [T; SIZE],
-    start: usize,
-    end: usize,
-    empty: bool,
-}
-
-impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER> {
-    pub unsafe fn new(initializer: fn()->T) -> Self{
+impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVER> {
+    pub(crate) fn new(list: [T; SIZE], start: usize, end: usize, empty: bool) -> Self {
+        Self{
+            list,
+            start,
+            end,
+            empty,
+        }
+    }
+    pub(crate) unsafe fn new_empty(initializer: fn()->T) -> Self{
         let list: [T; SIZE] = {
             let mut list: [T; SIZE] = unsafe {
                 MaybeUninit::uninit().assume_init()
@@ -53,6 +50,30 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         }
     }
 
+    pub(crate) fn len(&self) -> usize {
+        if self.empty {
+            return 0;
+        }
+
+        if self.end < self.start {
+            return SIZE - self.start + self.end + 1
+        }
+
+        self.end - self.start + 1
+    }
+
+    pub unsafe fn get_unchecked(&self, index: usize) -> &T {
+        unsafe {
+            self.list.get_unchecked(index)
+        }
+    }
+    
+    pub unsafe fn get_unchecked_mut(&mut self, index: usize) -> &mut T {
+        unsafe {
+            self.list.get_unchecked_mut(index)
+        }
+    }
+
     fn increment_start(&self) -> usize {
         (self.start+1)%SIZE
     }
@@ -62,8 +83,6 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
         }
         SIZE-1
     }
-
-
 
     fn increment_end(&self) -> usize {
         (self.end+1)%SIZE
@@ -76,7 +95,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> CyclicList<SIZE, T, WRITEOVER>
     }
 }
 
-impl<const SIZE: usize, T, const WRITEOVER: bool> PartialEq for CyclicList<SIZE, T, WRITEOVER> where T: PartialEq {
+impl<const SIZE: usize, T, const WRITE_OVER: bool> PartialEq for CyclicList<SIZE, T, WRITE_OVER> where T: PartialEq {
     fn eq(&self, other: &Self) -> bool {
 
         
@@ -84,205 +103,44 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> PartialEq for CyclicList<SIZE,
             return false;
         }
 
-        let tmp = self.iter()
-            .zip(other.iter())
-            .all(|(l1, l2)| {
-                l1 == l2
-            });
-
-        return tmp;
-    }
-}
-
-impl<const SIZE: usize, T, const WRITEOVER: bool> List<T> for CyclicList<SIZE, T, WRITEOVER> {
-    fn len(&self) -> usize {
-        if self.empty {
-            return 0;
-        }
-
-        if self.end < self.start {
-            return SIZE - self.start + self.end + 1
-        }
-
-        self.end - self.start + 1
-    }
-
-    fn insert_at(&mut self, elem: T, index: usize) -> Result<&mut Self, Error> where T: Clone {
-        //todo implement push from beginning and end
-        if self.len()+1 <= SIZE && WRITEOVER {
-            return Err(Error::Overflow)
-        }
-
-        if self.len() < index  {
-            return Err(Error::IndexOutOfRange)
-        }
-
-        if self.len() == index {
-            return self.push(elem);
-        }
-
-        if index == 0 {
-            self.start = self.decrement_start();
-
-            if self.start == self.end {
-                self.end = self.decrement_end();
+        for i1 in 0..self.len() {
+            if self[i1] != other[i1] {
+                return false;
             }
-
-            self.list[self.start] = elem;
-
-            return Ok(self)
         }
 
-        self.end = self.increment_end();
-
-        if self.start == self.end {
-            self.start = self.increment_start();
-        }
-
-        //shift everything from index to end
-        for i in (index..self.len()).rev() {
-            self.list[i] = self.list[i-1].clone();
-        }
-
-        //adding value at index
-        self.list[index] = elem;
-
-        Ok(self)
+        return true
     }
-
-    fn push(&mut self, elem: T) -> Result<&mut Self, Error> {
-        if self.len() + 1 > SIZE && !WRITEOVER {
-            return Err(Error::Overflow)
-        }
-
-        match (self.len(), self.empty) {
-            (0, true) => {
-                self.empty = false;
-            },
-            (_val, true) => {
-                panic!("How did i break the list");
-            }
-            _ => {
-                self.end = self.increment_end();
-
-                //if end pointer loops over to start pointer
-                if self.start == self.end {
-                    //dropping first value & incrementing start pointer
-                    self.start = self.increment_start();
-                }
-            },
-        }
-        
-        //pushing new value
-        self.list[self.end] = elem;
-
-
-        
-
-        Ok(self)
-    }
-
-    fn get(&self, index: usize) -> Result<&T, Error> {
-        if self.len() <= index{
-            return Err(Error::IndexOutOfRange)
-        }
-
-        Ok(&self.list[(self.start + index) % SIZE])
-    }
-
-    fn get_mut(&mut self, index: usize) -> Result<&mut T, Error> {
-        if self.len() <= index{
-            return Err(Error::IndexOutOfRange)
-        }
-
-        Ok(&mut self.list[(self.start + index) % SIZE])
-    }
-
-    fn pop(&mut self) -> Option<&mut T> {
-        if self.len() == 0 {
-            return None
-        }
-        let pop_index = self.end;
-
-        if self.end != self.start {
-            self.end = self.decrement_end();
-        }
-        else {
-            self.empty = true;
-        }
-        
-
-        Some(&mut self.list[pop_index])
-    }
-
-    fn remove_front(&mut self) -> Option<&mut T> {
-        if self.len() == 0 {
-            return None
-        }
-
-        let pop_index = self.start;
-
-        if self.end != self.start {
-            self.start = self.increment_start();
-        }
-        else {
-            self.empty = true;
-        }
-        
-
-        Some(&mut self.list[pop_index])
-    }
-
-    fn remove_at(&mut self, index: usize) -> Result<Option<T>, Error> where T: Clone {
-        if self.len() <= index  {
-            return Err(Error::IndexOutOfRange)
-        }
-
-        let val = Some(self[index].clone());
-
-        if index == 0 {
-            self.start = self.increment_start();
-
-            return Ok(val)
-        }
-        
-        for i in index..(self.len()-1) {
-            self.list[i] = self.list[i+1].clone();
-        }
-
-        self.end = self.increment_end();
-
-        Ok(val)
-    }
-
-    fn iter(&self) -> ListIter<T, Self> where Self: Sized {
-        ListIter::new(self)
-    }
-
-    fn iter_mut(&mut self) -> ListIter<T, Self> where Self: Sized {
-        ListIter::new(self)
-    }
-
-    
 }
 
-impl<const SIZE: usize, T, const WRITEOVER: bool> Display for CyclicList<SIZE, T, WRITEOVER> where T: Display{
+impl<const SIZE: usize, T, const WRITE_OVER: bool> Display for CyclicList<SIZE, T, WRITE_OVER> where T: Display{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let iter = (&self).iter();
+        if self.len() == 0 {
+            return write!(f, "[]");
+        }
 
-        let tmp = iter.fold(String::from(""), |acc, val| format!("{},{}", acc, val));
+        let mut str = String::new();
+        for i in 0..(self.list.len()-1) {
+            str.push_str(&format!("{},", self[i]));
+        };
+        str.push_str(&format!("{}", self[self.list.len()-1]));
 
-        write!(f, "[{}]", tmp)
+        write!(f, "[{}]", str)
     }
 }
 
-impl<const SIZE: usize, T, const WRITEOVER: bool> Debug for CyclicList<SIZE, T, WRITEOVER> where T: Debug{
+impl<const SIZE: usize, T, const WRITE_OVER: bool> Debug for CyclicList<SIZE, T, WRITE_OVER> where T: Debug{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("CyclicList").field("list", &self.list).field("start", &self.start).field("end", &self.end).field("size", &self.len()).finish()
+        f.debug_struct("CyclicList")
+            .field("list", &self.list)
+            .field("start", &self.start)
+            .field("end", &self.end)
+            .field("size", &self.len())
+            .finish()
     }
 }
 
-impl<const SIZE: usize, T, const WRITEOVER: bool> Default for CyclicList<SIZE, T, WRITEOVER> where T: Default {
+impl<const SIZE: usize, T, const WRITE_OVER: bool> Default for CyclicList<SIZE, T, WRITE_OVER> where T: Default {
     fn default() -> Self {
         let list: [T; SIZE] = array::from_fn(|_| T::default());
         
@@ -295,7 +153,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> Default for CyclicList<SIZE, T
     }
 }
 
-impl<const SIZE: usize, T, const WRITEOVER: bool> Index<usize> for CyclicList<SIZE, T, WRITEOVER> {
+impl<const SIZE: usize, T, const WRITE_OVER: bool> Index<usize> for CyclicList<SIZE, T, WRITE_OVER> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -307,7 +165,7 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> Index<usize> for CyclicList<SI
     }
 }
 
-impl<const SIZE: usize, T, const WRITEOVER: bool> IndexMut<usize> for CyclicList<SIZE, T, WRITEOVER> {
+impl<const SIZE: usize, T, const WRITE_OVER: bool> IndexMut<usize> for CyclicList<SIZE, T, WRITE_OVER> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         if self.len() <= index{
             panic!("{:?}", Error::IndexOutOfRange);
@@ -317,44 +175,30 @@ impl<const SIZE: usize, T, const WRITEOVER: bool> IndexMut<usize> for CyclicList
     }
 }
 
-impl <const SIZE: usize, T, const WRITEOVER: bool> TryFrom<Vec<T>>  for CyclicList<SIZE, T, WRITEOVER> where T: Default{
-    type Error = Error;
+impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> From<[T; LIST_SIZE]> for CyclicList<LIST_SIZE, T, WRITE_OVER>
+{
+    fn from(value: [T; LIST_SIZE]) -> Self {
+        let end = value.len() - 1;
 
-    fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
-        if SIZE < value.len() {
-            return Err(Error::InvalidSize)
+        CyclicList{
+            list: value,
+            start: 0,
+            end: end,
+            empty: false,
         }
-
-        let mut list: CyclicList<SIZE, T, WRITEOVER> = CyclicList::default();
-
-        for val in value {
-            if let Err(err) = list.push(val) {
-                return Err(err)
-            }
-        }
-
-        Ok(list)
     }
 }
 
-impl <const SIZE: usize, T, const WRITEOVER: bool> From<[T; SIZE]> for CyclicList<SIZE, T, WRITEOVER> where T: Default + Clone{
-    fn from(value: [T; SIZE]) -> Self {
-        let mut list = Self::default();
-
-        for i in 0..value.len() {
-            let _ =list.push(value[i].clone());
-        }
-
-        list
+impl<const LIST_SIZE: usize, T> From<CyclicList<LIST_SIZE, T, true>> for CyclicList<LIST_SIZE, T, false>
+{
+    fn from(value: CyclicList<LIST_SIZE, T, true>) -> Self {
+        Self::new(value.list, value.start, value.end, value.empty)
     }
 }
 
-
-impl<const SIZE: usize, T, const WRITEOVER: bool> Into<Vec<T>> for CyclicList<SIZE, T, WRITEOVER> where T: Clone{
-    fn into(self) -> Vec<T> {
-
-        self.iter()
-            .map(|val| val.clone())
-            .collect()
+impl<const LIST_SIZE: usize, T> From<CyclicList<LIST_SIZE, T, false>> for CyclicList<LIST_SIZE, T, true>
+{
+    fn from(value: CyclicList<LIST_SIZE, T, false>) -> Self {
+        Self::new(value.list, value.start, value.end, value.empty)
     }
 }
