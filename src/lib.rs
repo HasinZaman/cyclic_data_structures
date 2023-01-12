@@ -12,14 +12,14 @@ pub mod error;
 
 #[derive(Clone, Eq)]
 pub(crate) struct CyclicList<const SIZE: usize, T: Sized, const WRITE_OVER: bool>{
-    pub list: [T; SIZE],
+    pub list: [Option<T>; SIZE],
     pub(crate) start: usize,
     pub(crate) end: usize,
     pub(crate) empty: bool,
 }
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVER> {
-    pub(crate) fn new(list: [T; SIZE], start: usize, end: usize, empty: bool) -> Self {
+    pub(crate) fn new(list: [Option<T>; SIZE], start: usize, end: usize, empty: bool) -> Self {
         Self{
             list,
             start,
@@ -28,8 +28,8 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVE
         }
     }
     pub(crate) unsafe fn new_empty(initializer: fn()->T) -> Self{
-        let list: [T; SIZE] = {
-            let mut list: [T; SIZE] = unsafe {
+        let list: [Option<T>; SIZE] = {
+            let mut list: [Option<T>; SIZE] = unsafe {
                 MaybeUninit::uninit().assume_init()
             };
         
@@ -37,13 +37,13 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVE
                 unsafe {
                     ptr::write(
                         dst,
-                        initializer()
+                        Some(initializer())
                     );
                 }
             }
         
             unsafe {
-                mem::transmute::<_, [T; SIZE]>(list)
+                mem::transmute::<_, [Option<T>; SIZE]>(list)
             }
         };
 
@@ -69,13 +69,13 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVE
 
     pub unsafe fn get_unchecked(&self, index: usize) -> &T {
         unsafe {
-            self.list.get_unchecked(index)
+            self.list.get_unchecked(index).as_ref().unwrap()
         }
     }
     
     pub unsafe fn get_unchecked_mut(&mut self, index: usize) -> &mut T {
         unsafe {
-            self.list.get_unchecked_mut(index)
+            self.list.get_unchecked_mut(index).as_mut().unwrap()
         }
     }
 
@@ -126,9 +126,9 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> Display for CyclicList<SIZE, 
 
         let mut str = String::new();
         for i in 0..(self.list.len()-1) {
-            str.push_str(&format!("{},", self[i]));
+            str.push_str(&format!("{},", self[i].as_ref().unwrap()));
         };
-        str.push_str(&format!("{}", self[self.list.len()-1]));
+        str.push_str(&format!("{}", self[self.list.len()-1].as_ref().unwrap()));
 
         write!(f, "[{}]", str)
     }
@@ -147,7 +147,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> Debug for CyclicList<SIZE, T,
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> Default for CyclicList<SIZE, T, WRITE_OVER> where T: Default {
     fn default() -> Self {
-        let list: [T; SIZE] = array::from_fn(|_| T::default());
+        let list: [Option<T>; SIZE] = array::from_fn(|_| None);
         
         Self {
             list,
@@ -159,7 +159,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> Default for CyclicList<SIZE, 
 }
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> Index<usize> for CyclicList<SIZE, T, WRITE_OVER> {
-    type Output = T;
+    type Output = Option<T>;
 
     fn index(&self, index: usize) -> &Self::Output {
         if self.len() <= index{
@@ -183,12 +183,18 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> IndexMut<usize> for CyclicLis
 impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> From<[T; LIST_SIZE]> for CyclicList<LIST_SIZE, T, WRITE_OVER>
 {
     fn from(value: [T; LIST_SIZE]) -> Self {
-        let end = value.len() - 1;
+        let mut list : [Option<T>; LIST_SIZE] = array::from_fn(|_| None);
+
+        value.into_iter()
+            .map(|val| Some(val))
+            .enumerate()
+            .for_each(|(index, val)| list[index] = val);
+
 
         CyclicList{
-            list: value,
+            list,
             start: 0,
-            end: end,
+            end: LIST_SIZE - 1,
             empty: false,
         }
     }

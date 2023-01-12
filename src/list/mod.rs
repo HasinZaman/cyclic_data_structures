@@ -1,4 +1,4 @@
-use std::{ops::{Index, IndexMut}, fmt::{Display, Debug}, collections::LinkedList};
+use std::{ops::{Index, IndexMut}, fmt::{Display, Debug}, collections::LinkedList, mem};
 use std::convert::TryFrom;
 
 use crate::{CyclicList, error::Error};
@@ -36,11 +36,18 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         self.list.end = self.list.increment_end();
 
         for i in (index..self.len()).rev() {
-            self.list[i] = self.list[i-1].clone();
+            match i.checked_sub(1) {
+                Some(sub)=> self.list[i] = self.list[sub].clone(),
+                None => {
+                    if self.len() == SIZE {
+                        self.list[i] = self.list[SIZE-1].clone()
+                    }
+                },
+            }
         }
 
         //adding value at index
-        self.list[index] = elem;
+        self.list[index] = Some(elem);
 
         Ok(self)
     }
@@ -71,7 +78,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         //pushing new value
         let end = self.list.end;
 
-        self.list[end] = elem;
+        self.list[end] = Some(elem);
 
         Ok(self)
     }
@@ -97,7 +104,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
                 }
             },
         }
-        self.list[0] = elem;
+        self.list[0] = Some(elem);
 
         Ok(self)
     }
@@ -117,10 +124,10 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             list_index = (index % len).try_into().unwrap();
         }
 
-        Some(&self.list[list_index])
+        Some(&self.list[list_index].as_ref().unwrap())
     }
 
-    pub unsafe fn get_unchecked(&self, index: usize) -> &T {
+    pub unsafe fn get_unchecked(&self, _index: usize) -> &T {
         todo!()
     }
 
@@ -139,14 +146,14 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             list_index = (index % len).try_into().unwrap();
         }
 
-        Some(&mut self.list[list_index])
+        Some(self.list[list_index].as_mut().unwrap())
     }
 
-    pub unsafe fn get_unchecked_mut(&mut self, index: usize) -> &T {
+    pub unsafe fn get_unchecked_mut(&mut self, _index: usize) -> &T {
         todo!()
     }
 
-    pub fn remove_back(&mut self) -> Option<&mut T> {
+    pub fn remove_back(&mut self) -> Option<T> {
         if self.len() == 0 {
             return None
         }
@@ -159,11 +166,14 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             self.list.empty = true;
         }
         
+        let mut value = None;
 
-        Some(&mut self.list[pop_index])
+        mem::swap(&mut self.list[pop_index], &mut value);
+
+        Some(value.unwrap())
     }
 
-    pub fn remove_front(&mut self) -> Option<&mut T> {
+    pub fn remove_front(&mut self) -> Option<T> {
         if self.len() == 0 {
             return None
         }
@@ -177,30 +187,39 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             self.list.empty = true;
         }
         
+        let mut value = None;
 
-        Some(&mut self.list[pop_index])
+        mem::swap(&mut self.list[pop_index], &mut value);
+
+        Some(value.unwrap())
     }
 
-    pub fn remove_at(&mut self, index: usize) -> Result<Option<T>, Error> where T: Clone {
+    pub fn remove_at(&mut self, index: usize) -> Result<T, Error> where T: Clone {
         if self.len() <= index  {
             return Err(Error::IndexOutOfRange)
         }
 
-        let val = Some(self[index].clone());
+        let mut value = None;
+
+        mem::swap(&mut self.list[index], &mut value);
+
+        let value = value.unwrap();
 
         if index == 0 {
             self.list.start = self.list.increment_start();
 
-            return Ok(val)
+            return Ok(value)
         }
         
         for i in index..(self.len()-1) {
             self.list[i] = self.list[i+1].clone();
         }
+        let end = self.list.end;
+        self.list[end] = None;
 
         self.list.end = self.list.increment_end();
 
-        Ok(val)
+        Ok(value)
     }
 
     pub fn iter(&self) -> Iter<SIZE, T, WRITE_OVER> where Self: Sized {
@@ -231,13 +250,13 @@ impl<const S: usize, T, const W: bool> Index<usize> for List<S, T, W> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
-        &self.list[index]
+        self.list[index].as_ref().unwrap()
     }
 }
 
 impl<const S: usize, T, const W: bool> IndexMut<usize> for List<S, T, W> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        &mut self.list[index]
+        self.list[index].as_mut().unwrap()
     }
 }
 
@@ -252,7 +271,7 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Vec<T>> for List
         let mut list = Self::default();
 
         for element in value{
-            list.push_front(element).unwrap();
+            list.push_back(element).unwrap();
         }
 
         Ok(list)
@@ -274,6 +293,22 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<LinkedList<T>> f
         }
 
         Ok(list)
+    }
+}
+
+impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> FromIterator<T> for List<LIST_SIZE, T, WRITE_OVER> where T: Default {
+    fn from_iter<A: IntoIterator<Item = T>>(iter: A) -> Self {
+        let mut list :List<LIST_SIZE, T, WRITE_OVER> = List::default();
+        match WRITE_OVER {
+            true => {
+                for elem in iter {
+                    list.push_back(elem).unwrap();
+                }
+            },
+            false => todo!(),
+        }
+
+        list
     }
 }
 
