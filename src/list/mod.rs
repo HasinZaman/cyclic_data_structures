@@ -213,6 +213,41 @@ impl<const S: usize, T, const W: bool> IndexMut<usize> for List<S, T, W> {
     }
 }
 
+impl<const S: usize, T, const W: bool> Index<isize> for List<S, T, W> {
+    type Output = T;
+
+    fn index(&self, index: isize) -> &Self::Output {
+        if 0 <= index {
+            return self.list[index as usize].as_ref().unwrap();
+        }
+
+        if self.len() < index.abs() as usize {
+            panic!("{:?}", Error::IndexOutOfRange);
+        }
+
+
+        //index exists between [-1*self.len(), -1]
+        self.list[self.len() - index.abs() as usize].as_ref().unwrap()
+    }
+}
+
+impl<const S: usize, T, const W: bool> IndexMut<isize> for List<S, T, W> {
+    fn index_mut(&mut self, index: isize) -> &mut Self::Output {
+        if 0 <= index {
+            return self.list[index as usize].as_mut().unwrap();
+        }
+
+        if self.len() < index.abs() as usize {
+            panic!("{:?}", Error::IndexOutOfRange);
+        }
+
+
+        //index exists between [-1*self.len(), -1]
+        let len = self.len();
+        self.list[len - index.abs() as usize].as_mut().unwrap()
+    }
+}
+
 impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Vec<T>> for List<LIST_SIZE, T, WRITE_OVER> where T: Clone + Default {
     type Error = Error;
 

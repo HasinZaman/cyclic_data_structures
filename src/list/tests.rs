@@ -874,7 +874,7 @@ mod index{
     fn empty_index_out_of_range(){
         let list : List<SIZE, i64, false> = List::default();
 
-        list[0];
+        list[0usize];
     }
 
     #[test]
@@ -882,7 +882,7 @@ mod index{
     fn partially_filled_index_out_of_range(){
         let list : List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
 
-        list[4];
+        list[4usize];
     }
 
     #[test]
@@ -890,7 +890,7 @@ mod index{
     fn filled_index_out_of_range(){
         let list : List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
-        list[6];
+        list[6usize];
     }
 
     #[test]
@@ -900,7 +900,7 @@ mod index{
 
         assert!(list.push_back(6).is_ok());
 
-        list[6];
+        list[6usize];
     }
     
     #[test]
@@ -911,44 +911,112 @@ mod index{
         assert!(list.push_back(6).is_ok());
         assert!(list.remove_front().is_some());
 
-        list[4];
+        list[4usize];
     }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn empty_negative_index_out_of_range(){
+        let list : List<SIZE, i64, false> = List::default();
+
+        list[-1isize];
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_negative_index_out_of_range(){
+        let list : List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
+
+        list[-5isize];
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_negative_index_out_of_range(){
+        let list : List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        list[-6isize];
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_overflow_negative_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+
+        list[-6isize];
+    }
+    
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_overflow_negative_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+        assert!(list.remove_front().is_some());
+
+        list[-5isize];
+    }
+
 
     #[test]
     fn get(){
         let mut list: List<SIZE, u64, true> = vec![0,1,2,3,].try_into().unwrap();
 
         println!("{:?}", list);
-        assert_eq!(list[0], 0);
-        assert_eq!(list[1], 1);
-        assert_eq!(list[2], 2);
-        assert_eq!(list[3], 3);
+        assert_eq!(list[0usize], 0);
+        assert_eq!(list[1usize], 1);
+        assert_eq!(list[2usize], 2);
+        assert_eq!(list[3usize], 3);
+        
+        assert_eq!(list[-4isize], 0);
+        assert_eq!(list[-3isize], 1);
+        assert_eq!(list[-2isize], 2);
+        assert_eq!(list[-1isize], 3);
 
         assert!(list.push_back(4).is_ok());
 
         println!("{:?}", list);
-        assert_eq!(list[0], 0);
-        assert_eq!(list[1], 1);
-        assert_eq!(list[2], 2);
-        assert_eq!(list[3], 3);
-        assert_eq!(list[4], 4);
+        assert_eq!(list[0usize], 0);
+        assert_eq!(list[1usize], 1);
+        assert_eq!(list[2usize], 2);
+        assert_eq!(list[3usize], 3);
+        assert_eq!(list[4usize], 4);
+
+        assert_eq!(list[-5isize], 0);
+        assert_eq!(list[-4isize], 1);
+        assert_eq!(list[-3isize], 2);
+        assert_eq!(list[-2isize], 3);
+        assert_eq!(list[-1isize], 4);
 
         assert!(list.push_back(5).is_ok());
 
         println!("{:?}", list);
-        assert_eq!(list[0], 1);
-        assert_eq!(list[1], 2);
-        assert_eq!(list[2], 3);
-        assert_eq!(list[3], 4);
-        assert_eq!(list[4], 5);
+        assert_eq!(list[0usize], 1);
+        assert_eq!(list[1usize], 2);
+        assert_eq!(list[2usize], 3);
+        assert_eq!(list[3usize], 4);
+        assert_eq!(list[4usize], 5);
+
+        assert_eq!(list[-1isize], 1);
+        assert_eq!(list[-2isize], 2);
+        assert_eq!(list[-3isize], 3);
+        assert_eq!(list[-4isize], 4);
+        assert_eq!(list[-5isize], 5);
 
         assert!(list.remove_back().is_some());
         
         println!("{:?}", list);
-        assert_eq!(list[0], 2);
-        assert_eq!(list[1], 3);
-        assert_eq!(list[2], 4);
-        assert_eq!(list[3], 5);
+        assert_eq!(list[0usize], 2);
+        assert_eq!(list[1usize], 3);
+        assert_eq!(list[2usize], 4);
+        assert_eq!(list[3usize], 5);
+        
+        assert_eq!(list[-1isize], 2);
+        assert_eq!(list[-2isize], 3);
+        assert_eq!(list[-3isize], 4);
+        assert_eq!(list[-4isize], 5);
     }
 }
 
@@ -962,7 +1030,7 @@ mod index_mut{
     fn empty_index_out_of_range(){
         let mut list : List<SIZE, i64, false> = List::default();
 
-        list[0] = 1;
+        list[0usize] = 1;
     }
 
     #[test]
@@ -970,7 +1038,7 @@ mod index_mut{
     fn partially_filled_index_out_of_range(){
         let mut list : List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
 
-        list[4] = 4;
+        list[4usize] = 4;
     }
 
     #[test]
@@ -978,7 +1046,7 @@ mod index_mut{
     fn filled_index_out_of_range(){
         let mut list : List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
-        list[6] = 6;
+        list[6usize] = 6;
     }
 
     #[test]
@@ -988,7 +1056,7 @@ mod index_mut{
 
         assert!(list.push_back(6).is_ok());
 
-        list[6] = 7;
+        list[6usize] = 7;
     }
     
     #[test]
@@ -999,22 +1067,78 @@ mod index_mut{
         assert!(list.push_back(6).is_ok());
         assert!(list.remove_front().is_some());
 
-        list[4] = 8;
+        list[4usize] = 8;
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn empty_negative_index_out_of_range(){
+        let mut list : List<SIZE, i64, false> = List::default();
+
+        list[-1isize] = 4;
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_negative_index_out_of_range(){
+        let mut list : List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
+
+        list[-5isize] = 4;
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_negative_index_out_of_range(){
+        let mut list : List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        list[-6isize] = 4;
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_overflow_negative_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+
+        list[-6isize] = 4;
+    }
+    
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_overflow_negative_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+        assert!(list.remove_front().is_some());
+
+        list[-5isize] = 4;
     }
 
     #[test]
     fn update(){
         let mut list: List<SIZE, u64, true> = vec![0,1,2,3,].try_into().unwrap();
 
-        list[0] = 4;
-        list[1] = 5;
-        list[2] = 6;
-        list[3] = 7;
+        list[0usize] = 4;
+        list[1usize] = 5;
+        list[2usize] = 6;
+        list[3usize] = 7;
 
-        assert_eq!(list[0], 4);
-        assert_eq!(list[1], 5);
-        assert_eq!(list[2], 6);
-        assert_eq!(list[3], 7);
+        assert_eq!(list[0usize], 4);
+        assert_eq!(list[1usize], 5);
+        assert_eq!(list[2usize], 6);
+        assert_eq!(list[3usize], 7);
+
+        
+        list[-1isize] = 8;
+        list[-2isize] = 9;
+        list[-3isize] = 10;
+        list[-4isize] = 11;
+
+        assert_eq!(list[0usize], 11);
+        assert_eq!(list[1usize], 10);
+        assert_eq!(list[2usize], 9);
+        assert_eq!(list[3usize], 8);
     }
 }
 
