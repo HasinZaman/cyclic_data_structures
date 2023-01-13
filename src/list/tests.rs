@@ -64,95 +64,27 @@ mod insert_at{
     
     #[test]
     fn push_back() {
-        let mut list: List<SIZE, i64, true> = List::default();
-        let mut expected = vec![];
-
-        for i in 1..=10{
-            assert!(list.insert_at(i, list.len()).is_ok());
-            println!("{}\n{:?}", i, list);
-            match i as usize {
-                0..=SIZE => {
-                    expected.push(i);
-                },
-                _=>{
-                    expected.remove(0);
-                    expected.push(i);
-                }
-            }
-
-            assert_eq!(list.len(), min(i as usize, SIZE));
-            assert_eq!(
-                list,
-                List::<SIZE, i64, true>::try_from(expected.clone()).unwrap()
-            );
-        }
+        todo!();
     }
     
     #[test]
     fn push_front() {
-        let mut list: List<SIZE, i64, true> = List::default();
-        let mut expected = vec![];
-
-        for i in 1..=10{
-            assert!(list.insert_at(i, 0).is_ok());
-            println!("{}\n{:?}", i, list);
-            match i as usize {
-                0..=SIZE => {
-                    expected.insert(0, i);
-                },
-                _=>{
-                    expected.pop();
-                    expected.insert(0, i);
-                }
-            }
-
-            assert_eq!(list.len(), min(i as usize, SIZE));
-            assert_eq!(
-                list,
-                List::<SIZE, i64, true>::try_from(expected.clone()).unwrap()
-            );
-        }
+        todo!();
     }
 
     #[test]
     fn insert_middle() {
-        let mut list: List<SIZE, i64, true> = vec![1,2,3].try_into().unwrap();
-        let mut expected = vec![1,2,3];
-
-        for i in 1..=10{
-            assert!(list.insert_at(10, 1).is_ok());
-            println!("{}\n{:?}", i, list);
-            match list.len() {
-                0..=SIZE => {
-                    expected.insert(1, 10);
-                    assert_eq!(list.len(), i as usize + 3);
-                },
-                _=>{
-                    expected.pop();
-                    expected.insert(1, 10);
-                }
-            }
-
-            assert_eq!(list.len(), min(i as usize + 3, SIZE));
-            assert_eq!(
-                list,
-                List::<SIZE, i64, true>::try_from(expected.clone()).unwrap()
-            );
-        }
+        todo!();
     }
 
     #[test]
     fn no_overflow(){
-        let mut list: List<SIZE, i64, false> = vec![1,2,3,4,5].try_into().unwrap();
-        
-        assert_eq!(Err(Error::Overflow), list.insert_at(10, 1));
+        todo!();
     }
 
     #[test]
     fn index_out_of_range(){
-        let mut list: List<SIZE, i64, false> = vec![1,].try_into().unwrap();
-        
-        assert_eq!(Err(Error::IndexOutOfRange), list.insert_at(10, 4));
+        todo!();
     }
 }
 
