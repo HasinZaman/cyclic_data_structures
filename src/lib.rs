@@ -180,8 +180,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> IndexMut<usize> for CyclicLis
     }
 }
 
-impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> From<[T; LIST_SIZE]> for CyclicList<LIST_SIZE, T, WRITE_OVER>
-{
+impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> From<[T; LIST_SIZE]> for CyclicList<LIST_SIZE, T, WRITE_OVER> {
     fn from(value: [T; LIST_SIZE]) -> Self {
         let mut list : [Option<T>; LIST_SIZE] = array::from_fn(|_| None);
 
@@ -200,15 +199,13 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> From<[T; LIST_SIZE]> for
     }
 }
 
-impl<const LIST_SIZE: usize, T> From<CyclicList<LIST_SIZE, T, true>> for CyclicList<LIST_SIZE, T, false>
-{
+impl<const LIST_SIZE: usize, T> From<CyclicList<LIST_SIZE, T, true>> for CyclicList<LIST_SIZE, T, false> {
     fn from(value: CyclicList<LIST_SIZE, T, true>) -> Self {
         Self::new(value.list, value.start, value.end, value.empty)
     }
 }
 
-impl<const LIST_SIZE: usize, T> From<CyclicList<LIST_SIZE, T, false>> for CyclicList<LIST_SIZE, T, true>
-{
+impl<const LIST_SIZE: usize, T> From<CyclicList<LIST_SIZE, T, false>> for CyclicList<LIST_SIZE, T, true> {
     fn from(value: CyclicList<LIST_SIZE, T, false>) -> Self {
         Self::new(value.list, value.start, value.end, value.empty)
     }
