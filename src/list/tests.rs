@@ -677,7 +677,7 @@ mod iter_mut{
 
     #[test]
     fn empty(){
-        let list: List<SIZE, i64, false> = List::default();
+        let mut list: List<SIZE, i64, false> = List::default();
 
         let mut iter = list.iter_mut();
 
@@ -694,8 +694,8 @@ mod iter_mut{
         let expected: Vec<i64>= vec![1,2,3,4,5];
         let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
-        let mut actual = list.iter_mut();
-        let mut expected = expected.iter_mut();
+        let mut actual = list.iter();
+        let mut expected = expected.iter();
 
         for (actual, expected) in (&mut actual).zip(&mut expected){
             assert_eq!(actual, expected);
@@ -711,7 +711,7 @@ mod iter_mut{
 
     #[test]
     fn iter_size(){
-        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
         
         let mut iter = list.iter_mut();
         let mut i1 = SIZE;
@@ -736,7 +736,7 @@ mod iter_mut{
         assert!(list.push_back(7).is_ok());
 
         let mut actual = list.iter_mut();
-        let mut expected = expected.iter_mut();
+        let mut expected = expected.iter();
 
         for (actual, expected) in (&mut actual).zip(&mut expected){
             assert_eq!(actual, expected);
