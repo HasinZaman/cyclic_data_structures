@@ -224,7 +224,9 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Vec<T>> for List
         let mut list = Self::default();
 
         for element in value{
-            list.push_back(element).unwrap();
+            if let Err(err) = list.push_back(element) {
+                return Err(err);
+            }
         }
 
         Ok(list)
@@ -252,13 +254,9 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<LinkedList<T>> f
 impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> FromIterator<T> for List<LIST_SIZE, T, WRITE_OVER> where T: Default {
     fn from_iter<A: IntoIterator<Item = T>>(iter: A) -> Self {
         let mut list :List<LIST_SIZE, T, WRITE_OVER> = List::default();
-        match WRITE_OVER {
-            true => {
-                for elem in iter {
-                    list.push_back(elem).unwrap();
-                }
-            },
-            false => todo!(),
+
+        for elem in iter {
+            list.push_back(elem).unwrap();
         }
 
         list
@@ -281,6 +279,7 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Box<dyn Iterator
         Ok(list)
     }
 }
+
 
 impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> From<[T; LIST_SIZE]> for List<LIST_SIZE, T, WRITE_OVER> {
     fn from(value: [T; LIST_SIZE]) -> Self {
