@@ -21,35 +21,8 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
     }
 
     pub fn insert_at(&mut self, elem: T, index: usize) -> Result<&mut Self, Error> where T: Clone {
-        if self.len()+1 > SIZE && !WRITE_OVER {
-            return Err(Error::Overflow)
-        }
-
-        if self.len() < index  {
-            return Err(Error::IndexOutOfRange)
-        }
-
-        if self.len() == index {
-            return self.push_back(elem);
-        }
-
-        self.list.end = self.list.increment_end();
-
-        for i in (index..self.len()).rev() {
-            match i.checked_sub(1) {
-                Some(sub)=> self.list[i] = self.list[sub].clone(),
-                None => {
-                    if self.len() == SIZE {
-                        self.list[i] = self.list[SIZE-1].clone()
-                    }
-                },
-            }
-        }
-
-        //adding value at index
-        self.list[index] = Some(elem);
-
-        Ok(self)
+        
+        todo!();
     }
 
     pub fn push_back(&mut self, elem: T) -> Result<&mut Self, Error> {
@@ -127,9 +100,11 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         Some(&self.list[list_index].as_ref().unwrap())
     }
 
+    /*
     pub unsafe fn get_unchecked(&self, _index: usize) -> &T {
         todo!()
     }
+    */
 
     pub fn get_mut(&mut self, index: isize) -> Option<&mut T> {
         if self.len() == 0 {
@@ -149,10 +124,11 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         Some(self.list[list_index].as_mut().unwrap())
     }
 
+    /*
     pub unsafe fn get_unchecked_mut(&mut self, _index: usize) -> &T {
         todo!()
     }
-
+    */
     pub fn remove_back(&mut self) -> Option<T> {
         if self.len() == 0 {
             return None
@@ -195,31 +171,8 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
     }
 
     pub fn remove_at(&mut self, index: usize) -> Result<T, Error> where T: Clone {
-        if self.len() <= index  {
-            return Err(Error::IndexOutOfRange)
-        }
-
-        let mut value = None;
-
-        mem::swap(&mut self.list[index], &mut value);
-
-        let value = value.unwrap();
-
-        if index == 0 {
-            self.list.start = self.list.increment_start();
-
-            return Ok(value)
-        }
         
-        for i in index..(self.len()-1) {
-            self.list[i] = self.list[i+1].clone();
-        }
-        let end = self.list.end;
-        self.list[end] = None;
-
-        self.list.end = self.list.increment_end();
-
-        Ok(value)
+        todo!();
     }
 
     pub fn iter(&self) -> Iter<SIZE, T, WRITE_OVER> where Self: Sized {
