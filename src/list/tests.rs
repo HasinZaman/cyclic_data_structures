@@ -209,7 +209,7 @@ mod push_front{
 }
 
 mod get{
-    use crate::{list::List, error::Error};
+    use crate::{list::List};
 
     const SIZE: usize = 5;
     #[test]
@@ -217,26 +217,28 @@ mod get{
         let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
 
         println!("{:?}", list);
-        for i in 0..list.len(){
-            println!("get at({i})");
-            assert_eq!(list.get(i as isize), Some(&i));
-        }
+        assert_eq!(list.get(0), Some(&0));
+        assert_eq!(list.get(1), Some(&1));
+        assert_eq!(list.get(2), Some(&2));
+        assert_eq!(list.get(3), Some(&3));
 
         assert!(list.push_back(4).is_ok());
 
         println!("{:?}", list);
-        for i in 0..list.len(){
-            println!("get at({i})");
-            assert_eq!(list.get(i as isize), Some(&i));
-        }
+        assert_eq!(list.get(0), Some(&0));
+        assert_eq!(list.get(1), Some(&1));
+        assert_eq!(list.get(2), Some(&2));
+        assert_eq!(list.get(3), Some(&3));
+        assert_eq!(list.get(4), Some(&4));
 
         assert!(list.push_back(5).is_ok());
 
         println!("{:?}", list);
-        for i in 0..list.len(){
-            println!("get at({i})");
-            assert_eq!(list.get(i as isize), Some(&(i + 1)));
-        }
+        assert_eq!(list.get(0), Some(&1));
+        assert_eq!(list.get(1), Some(&2));
+        assert_eq!(list.get(2), Some(&3));
+        assert_eq!(list.get(3), Some(&4));
+        assert_eq!(list.get(4), Some(&5));
     }
 
     #[test]
@@ -244,97 +246,302 @@ mod get{
         let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
 
         println!("{:?}", list);
-        for i in list.len()..list.len()*2{
-            println!("get at({i})");
-            assert_eq!(list.get(i as isize), Some(&(i%list.len())));
-        }
+        assert_eq!(list.get(0 + list.len() as isize), Some(&0));
+        assert_eq!(list.get(1 + list.len() as isize), Some(&1));
+        assert_eq!(list.get(2 + list.len() as isize), Some(&2));
+        assert_eq!(list.get(3 + list.len() as isize), Some(&3));
 
         assert!(list.push_back(4).is_ok());
 
         println!("{:?}", list);
-        for i in list.len()..list.len()*2{
-            println!("get at({i})");
-            assert_eq!(list.get(i as isize), Some(&(i%list.len())));
-        }
+        assert_eq!(list.get(0 + list.len() as isize), Some(&0));
+        assert_eq!(list.get(1 + list.len() as isize), Some(&1));
+        assert_eq!(list.get(2 + list.len() as isize), Some(&2));
+        assert_eq!(list.get(3 + list.len() as isize), Some(&3));
+        assert_eq!(list.get(4 + list.len() as isize), Some(&4));
 
         assert!(list.push_back(5).is_ok());
 
         println!("{:?}", list);
-        for i in list.len()..list.len()*2{
-            println!("get at({i})");
-            assert_eq!(list.get(i as isize), Some(&((i+1)%list.len())));
-        }
+        assert_eq!(list.get(0 + list.len() as isize), Some(&1));
+        assert_eq!(list.get(1 + list.len() as isize), Some(&2));
+        assert_eq!(list.get(2 + list.len() as isize), Some(&3));
+        assert_eq!(list.get(3 + list.len() as isize), Some(&4));
+        assert_eq!(list.get(4 + list.len() as isize), Some(&5));
     }
 
     #[test]
     fn get_from_back(){
-        todo!();
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        println!("{:?}", list);
+        assert_eq!(list.get(-1), Some(&3));
+        assert_eq!(list.get(-2), Some(&2));
+        assert_eq!(list.get(-3), Some(&1));
+        assert_eq!(list.get(-4), Some(&0));
+
+        assert!(list.push_back(4).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get(-1), Some(&4));
+        assert_eq!(list.get(-2), Some(&3));
+        assert_eq!(list.get(-3), Some(&2));
+        assert_eq!(list.get(-4), Some(&1));
+        assert_eq!(list.get(-5), Some(&0));
+
+        assert!(list.push_back(5).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get(-1), Some(&5));
+        assert_eq!(list.get(-2), Some(&4));
+        assert_eq!(list.get(-3), Some(&3));
+        assert_eq!(list.get(-4), Some(&2));
+        assert_eq!(list.get(-5), Some(&1));
     }
 
     #[test]
     fn get_from_back_overflow(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        println!("{:?}", list);
+        assert_eq!(list.get(-1 + -1 * list.len() as  isize), Some(&3));
+        assert_eq!(list.get(-2 + -1 * list.len() as  isize), Some(&2));
+        assert_eq!(list.get(-3 + -1 * list.len() as  isize), Some(&1));
+        assert_eq!(list.get(-4 + -1 * list.len() as  isize), Some(&0));
+
+        assert!(list.push_back(4).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get(-1 + -1 * list.len() as  isize), Some(&4));
+        assert_eq!(list.get(-2 + -1 * list.len() as  isize), Some(&3));
+        assert_eq!(list.get(-3 + -1 * list.len() as  isize), Some(&2));
+        assert_eq!(list.get(-4 + -1 * list.len() as  isize), Some(&1));
+        assert_eq!(list.get(-5 + -1 * list.len() as  isize), Some(&0));
+
+        assert!(list.push_back(5).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get(-1 + -1 * list.len() as  isize), Some(&5));
+        assert_eq!(list.get(-2 + -1 * list.len() as  isize), Some(&4));
+        assert_eq!(list.get(-3 + -1 * list.len() as  isize), Some(&3));
+        assert_eq!(list.get(-4 + -1 * list.len() as  isize), Some(&2));
+        assert_eq!(list.get(-5 + -1 * list.len() as  isize), Some(&1));
     }
 
     #[test]
     fn empty(){
         let list: List<SIZE, i64, false> = List::default();
 
-        for i in 0..SIZE{
-            assert_eq!(None, list.get(i as isize));
+        for i in (-1 * SIZE as isize)..(SIZE as isize){
+            assert_eq!(None, list.get(i));
         }
     }
 }
 
 mod get_mut{
-    
+    use crate::{list::List};
+
+    const SIZE: usize = 5;
     #[test]
     fn get(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(0), Some(&mut 0));
+        assert_eq!(list.get_mut(1), Some(&mut 1));
+        assert_eq!(list.get_mut(2), Some(&mut 2));
+        assert_eq!(list.get_mut(3), Some(&mut 3));
+
+        assert!(list.push_back(4).is_ok());
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(0), Some(&mut 0));
+        assert_eq!(list.get_mut(1), Some(&mut 1));
+        assert_eq!(list.get_mut(2), Some(&mut 2));
+        assert_eq!(list.get_mut(3), Some(&mut 3));
+        assert_eq!(list.get_mut(4), Some(&mut 4));
+
+        assert!(list.push_back(5).is_ok());
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(0), Some(&mut 1));
+        assert_eq!(list.get_mut(1), Some(&mut 2));
+        assert_eq!(list.get_mut(2), Some(&mut 3));
+        assert_eq!(list.get_mut(3), Some(&mut 4));
+        assert_eq!(list.get_mut(4), Some(&mut 5));
     }
 
     #[test]
     fn get_overflow(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(0 + list.len() as isize), Some(&mut 0));
+        assert_eq!(list.get_mut(1 + list.len() as isize), Some(&mut 1));
+        assert_eq!(list.get_mut(2 + list.len() as isize), Some(&mut 2));
+        assert_eq!(list.get_mut(3 + list.len() as isize), Some(&mut 3));
+
+        assert!(list.push_back(4).is_ok());
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(0 + list.len() as isize), Some(&mut 0));
+        assert_eq!(list.get_mut(1 + list.len() as isize), Some(&mut 1));
+        assert_eq!(list.get_mut(2 + list.len() as isize), Some(&mut 2));
+        assert_eq!(list.get_mut(3 + list.len() as isize), Some(&mut 3));
+        assert_eq!(list.get_mut(4 + list.len() as isize), Some(&mut 4));
+
+        assert!(list.push_back(5).is_ok());
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(0 + list.len() as isize), Some(&mut 1));
+        assert_eq!(list.get_mut(1 + list.len() as isize), Some(&mut 2));
+        assert_eq!(list.get_mut(2 + list.len() as isize), Some(&mut 3));
+        assert_eq!(list.get_mut(3 + list.len() as isize), Some(&mut 4));
+        assert_eq!(list.get_mut(4 + list.len() as isize), Some(&mut 5));
     }
 
     #[test]
     fn get_from_back(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(-1), Some(&mut 3));
+        assert_eq!(list.get_mut(-2), Some(&mut 2));
+        assert_eq!(list.get_mut(-3), Some(&mut 1));
+        assert_eq!(list.get_mut(-4), Some(&mut 0));
+
+        assert!(list.push_back(4).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(-1), Some(&mut 4));
+        assert_eq!(list.get_mut(-2), Some(&mut 3));
+        assert_eq!(list.get_mut(-3), Some(&mut 2));
+        assert_eq!(list.get_mut(-4), Some(&mut 1));
+        assert_eq!(list.get_mut(-5), Some(&mut 0));
+
+        assert!(list.push_back(5).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(-1), Some(&mut 4));
+        assert_eq!(list.get_mut(-2), Some(&mut 3));
+        assert_eq!(list.get_mut(-3), Some(&mut 2));
+        assert_eq!(list.get_mut(-4), Some(&mut 1));
+        assert_eq!(list.get_mut(-5), Some(&mut 5));
     }
 
     #[test]
     fn get_from_back_overflow(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(-1 + -1 * list.len() as  isize), Some(&mut 3));
+        assert_eq!(list.get_mut(-2 + -1 * list.len() as  isize), Some(&mut 2));
+        assert_eq!(list.get_mut(-3 + -1 * list.len() as  isize), Some(&mut 1));
+        assert_eq!(list.get_mut(-4 + -1 * list.len() as  isize), Some(&mut 0));
+
+        assert!(list.push_back(4).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(-1 + -1 * list.len() as  isize), Some(&mut 4));
+        assert_eq!(list.get_mut(-2 + -1 * list.len() as  isize), Some(&mut 3));
+        assert_eq!(list.get_mut(-3 + -1 * list.len() as  isize), Some(&mut 2));
+        assert_eq!(list.get_mut(-4 + -1 * list.len() as  isize), Some(&mut 1));
+        assert_eq!(list.get_mut(-5 + -1 * list.len() as  isize), Some(&mut 0));
+
+        assert!(list.push_back(5).is_ok());
+        println!("{:?}", list);
+        assert_eq!(list.get_mut(-1 + -1 * list.len() as  isize), Some(&mut 5));
+        assert_eq!(list.get_mut(-2 + -1 * list.len() as  isize), Some(&mut 4));
+        assert_eq!(list.get_mut(-3 + -1 * list.len() as  isize), Some(&mut 3));
+        assert_eq!(list.get_mut(-4 + -1 * list.len() as  isize), Some(&mut 2));
+        assert_eq!(list.get_mut(-5 + -1 * list.len() as  isize), Some(&mut 1));
+    }
+
+    #[test]
+    fn empty(){
+        let mut list: List<SIZE, i64, false> = List::default();
+
+        for i in (-2 * SIZE as isize)..(2 * SIZE as isize){
+            assert_eq!(None, list.get_mut(i));
+        }
     }
 
     #[test]
     fn update(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        *list.get_mut(0).unwrap() = 4;
+
+        assert_eq!(list.get(0), Some(&4));
+        
+        *list.get_mut(-1).unwrap() = 5;
+
+        assert_eq!(list.get(-1), Some(&5));
+        
+        *list.get_mut(4 + list.len() as isize).unwrap() = 6;
+
+        assert_eq!(list.get(-1), Some(&6));
     }
 }
 
 mod remove_back{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = List::default();
+
+        assert_eq!(None, list.remove_back());
     }
 
     #[test]
     fn get_last(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        assert_eq!(Some(3), list.remove_back());
+        assert_eq!(Some(2), list.remove_back());
+        assert_eq!(Some(1), list.remove_back());
+        assert_eq!(Some(0), list.remove_back());
+        assert_eq!(None, list.remove_back());
+
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,4].try_into().unwrap();
+        assert!(list.push_back(5).is_ok());
+
+        assert_eq!(Some(5), list.remove_back());
+        assert_eq!(Some(4), list.remove_back());
+        assert_eq!(Some(3), list.remove_back());
+        assert_eq!(Some(2), list.remove_back());
+        assert_eq!(Some(1), list.remove_back());
+        assert_eq!(None, list.remove_back());
     }
 }
 
 mod remove_front{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = List::default();
+
+        assert_eq!(None, list.remove_front());
     }
 
     #[test]
     fn get_last(){
-        todo!()
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        assert_eq!(Some(0), list.remove_front());
+        assert_eq!(Some(1), list.remove_front());
+        assert_eq!(Some(2), list.remove_front());
+        assert_eq!(Some(3), list.remove_front());
+        assert_eq!(None, list.remove_front());
+
+        let mut list: List<SIZE, usize, true> = vec![0,1,2,3,4].try_into().unwrap();
+        assert!(list.push_back(5).is_ok());
+
+        assert_eq!(Some(1), list.remove_front());
+        assert_eq!(Some(2), list.remove_front());
+        assert_eq!(Some(3), list.remove_front());
+        assert_eq!(Some(4), list.remove_front());
+        assert_eq!(Some(5), list.remove_front());
+        assert_eq!(None, list.remove_front());
     }
 }
 
@@ -361,36 +568,208 @@ mod remove_at{
 }
 
 mod iter{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::default();
+
+        let mut iter = list.iter();
+
+        assert_eq!(None, iter.next());
+
+        
+        let iter = list.iter();
+
+        assert_eq!(0, iter.len());
     }
 
     #[test]
     fn iter(){
-        todo!()
+        let expected: Vec<i64>= vec![1,2,3,4,5];
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        let mut actual = list.iter();
+        let mut expected = expected.iter();
+
+        for (actual, expected) in (&mut actual).zip(&mut expected){
+            assert_eq!(actual, expected);
+        }
+
+        if let (None, None) = (actual.next(), expected.next()) {
+            assert!(true);
+        }
+        else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn iter_size(){
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        
+        let mut iter = list.iter();
+        let mut i1 = SIZE;
+
+
+        assert_eq!(i1, iter.len());
+
+        while let Some(_) = iter.next() {
+            i1 = i1 - 1;
+        
+            assert_eq!(i1, iter.len());
+        }
+        assert_eq!(0, iter.len());
     }
     
     #[test]
-    fn iter_over_overflow(){
-        todo!()
+    fn iter_overflow(){
+        let expected: Vec<i64>= vec![3,4,5,6,7];
+        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+        assert!(list.push_back(7).is_ok());
+
+        let mut actual = list.iter();
+        let mut expected = expected.iter();
+
+        for (actual, expected) in (&mut actual).zip(&mut expected){
+            assert_eq!(actual, expected);
+        }
+
+        if let (None, None) = (actual.next(), expected.next()) {
+            assert!(true);
+        }
+        else {
+            assert!(false);
+        }
+
+    }
+
+    #[test]
+    fn iter_overflow_size(){
+        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        
+        assert!(list.push_back(6).is_ok());
+        assert!(list.push_back(7).is_ok());
+        
+        let mut iter = list.iter();
+        let mut i1 = SIZE;
+
+
+        assert_eq!(i1, iter.len());
+
+        while let Some(_) = iter.next() {
+            i1 = i1 - 1;
+        
+            assert_eq!(i1, iter.len());
+        }
+        assert_eq!(0, iter.len());
     }
 }
 
 mod iter_mut{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::default();
+
+        let mut iter = list.iter_mut();
+
+        assert_eq!(None, iter.next());
+
+        
+        let iter = list.iter_mut();
+
+        assert_eq!(0, iter.len());
     }
 
     #[test]
     fn iter(){
-        todo!()
+        let expected: Vec<i64>= vec![1,2,3,4,5];
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        let mut actual = list.iter_mut();
+        let mut expected = expected.iter_mut();
+
+        for (actual, expected) in (&mut actual).zip(&mut expected){
+            assert_eq!(actual, expected);
+        }
+
+        if let (None, None) = (actual.next(), expected.next()) {
+            assert!(true);
+        }
+        else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn iter_size(){
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        
+        let mut iter = list.iter_mut();
+        let mut i1 = SIZE;
+
+
+        assert_eq!(i1, iter.len());
+
+        while let Some(_) = iter.next() {
+            i1 = i1 - 1;
+        
+            assert_eq!(i1, iter.len());
+        }
+        assert_eq!(0, iter.len());
     }
     
     #[test]
-    fn iter_over_overflow(){
-        todo!()
+    fn iter_overflow(){
+        let expected: Vec<i64>= vec![3,4,5,6,7];
+        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+        assert!(list.push_back(7).is_ok());
+
+        let mut actual = list.iter_mut();
+        let mut expected = expected.iter_mut();
+
+        for (actual, expected) in (&mut actual).zip(&mut expected){
+            assert_eq!(actual, expected);
+        }
+
+        if let (None, None) = (actual.next(), expected.next()) {
+            assert!(true);
+        }
+        else {
+            assert!(false);
+        }
+
+    }
+
+    #[test]
+    fn iter_overflow_size(){
+        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        
+        assert!(list.push_back(6).is_ok());
+        assert!(list.push_back(7).is_ok());
+        
+        let mut iter = list.iter_mut();
+        let mut i1 = SIZE;
+
+
+        assert_eq!(i1, iter.len());
+
+        while let Some(_) = iter.next() {
+            i1 = i1 - 1;
+        
+            assert_eq!(i1, iter.len());
+        }
+        assert_eq!(0, iter.len());
     }
 
     #[test]
