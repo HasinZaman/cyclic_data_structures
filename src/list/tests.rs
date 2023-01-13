@@ -56,11 +56,7 @@ mod len{
 }
 
 mod insert_at{
-    use std::cmp::min;
-
-    use crate::{list::List, error::Error};
-
-    const SIZE: usize = 5;
+    const _SIZE: usize = 5;
     
     #[test]
     fn push_back() {
@@ -779,192 +775,531 @@ mod iter_mut{
 }
 
 mod display{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::default();
+
+        let actual = list.to_string();
+
+        assert_eq!(actual, "[]");
     }
 
     #[test]
     fn partially_filled(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
+
+        let actual = list.to_string();
+
+        assert_eq!(actual, "[1,2,3]");
     }
 
     #[test]
     fn filled(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        let actual = list.to_string();
+
+        assert_eq!(actual, "[1,2,3,4,5]");
     }
 
     #[test]
     fn overflow(){
-        todo!()
+        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+
+        let actual = list.to_string();
+
+        assert_eq!(actual, "[2,3,4,5,6]");
     }
 }
 
 mod debug{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::default();
+
+        let actual = format!("{list:?}");
+
+        assert_eq!("List { : CyclicList { list: [None, None, None, None, None], start: 0, end: 0, size: 0 } }", actual)
     }
 
     #[test]
     fn partially_filled(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
+
+        let actual = format!("{list:?}");
+
+        assert_eq!("List { : CyclicList { list: [Some(1), Some(2), Some(3), None, None], start: 0, end: 2, size: 3 } }", actual);
     }
 
     #[test]
     fn filled(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        let actual = format!("{list:?}");
+
+        assert_eq!("List { : CyclicList { list: [Some(1), Some(2), Some(3), Some(4), Some(5)], start: 0, end: 4, size: 5 } }", actual);
     }
 
     #[test]
     fn overflow(){
-        todo!()
+        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+        let actual = format!("{list:?}");
+        assert_eq!("List { : CyclicList { list: [Some(6), Some(2), Some(3), Some(4), Some(5)], start: 1, end: 0, size: 5 } }", actual);
+
+        assert!(list.remove_front().is_some());
+        let actual = format!("{list:?}");
+        assert_eq!("List { : CyclicList { list: [Some(6), None, Some(3), Some(4), Some(5)], start: 2, end: 0, size: 5 } }", actual);
     }
 }
 
 mod index{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
-    fn index_out_of_range(){
-        todo!()
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn empty_index_out_of_range(){
+        let list : List<SIZE, i64, false> = List::default();
+
+        list[0];
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_index_out_of_range(){
+        let list : List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
+
+        list[4];
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_index_out_of_range(){
+        let list : List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        list[6];
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_overflow_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+
+        list[6];
+    }
+    
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_overflow_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+        assert!(list.remove_front().is_some());
+
+        list[4];
     }
 
     #[test]
     fn get(){
-        todo!()
+        let mut list: List<SIZE, u64, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        println!("{:?}", list);
+        assert_eq!(list[0], 0);
+        assert_eq!(list[1], 1);
+        assert_eq!(list[2], 2);
+        assert_eq!(list[3], 3);
+
+        assert!(list.push_back(4).is_ok());
+
+        println!("{:?}", list);
+        assert_eq!(list[0], 0);
+        assert_eq!(list[1], 1);
+        assert_eq!(list[2], 2);
+        assert_eq!(list[3], 3);
+        assert_eq!(list[4], 4);
+
+        assert!(list.push_back(5).is_ok());
+
+        println!("{:?}", list);
+        assert_eq!(list[0], 1);
+        assert_eq!(list[1], 2);
+        assert_eq!(list[2], 3);
+        assert_eq!(list[3], 4);
+        assert_eq!(list[4], 5);
+
+        assert!(list.remove_back().is_some());
+        
+        println!("{:?}", list);
+        assert_eq!(list[0], 2);
+        assert_eq!(list[1], 3);
+        assert_eq!(list[2], 4);
+        assert_eq!(list[3], 5);
     }
 }
 
 mod index_mut{
+    use crate::list::List;
+
+    const SIZE: usize = 5;
+
     #[test]
-    fn index_out_of_range(){
-        todo!()
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn empty_index_out_of_range(){
+        let mut list : List<SIZE, i64, false> = List::default();
+
+        list[0] = 1;
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_index_out_of_range(){
+        let mut list : List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
+
+        list[4] = 4;
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_index_out_of_range(){
+        let mut list : List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        list[6] = 6;
+    }
+
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn filled_overflow_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+
+        list[6] = 7;
+    }
+    
+    #[test]
+    #[should_panic(expected = "IndexOutOfRange")]
+    fn partially_filled_overflow_index_out_of_range(){
+        let mut list : List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+
+        assert!(list.push_back(6).is_ok());
+        assert!(list.remove_front().is_some());
+
+        list[4] = 8;
     }
 
     #[test]
     fn update(){
-        todo!()
+        let mut list: List<SIZE, u64, true> = vec![0,1,2,3,].try_into().unwrap();
+
+        list[0] = 4;
+        list[1] = 5;
+        list[2] = 6;
+        list[3] = 7;
+
+        assert_eq!(list[0], 4);
+        assert_eq!(list[1], 5);
+        assert_eq!(list[2], 6);
+        assert_eq!(list[3], 7);
     }
 }
 
 mod try_from_vec{
+    use crate::{list::List, CyclicList, error::Error};
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::try_from(vec![]).unwrap();
+
+        assert_eq!(list, List::default());
     }
     
     #[test]
     fn smaller_than_list(){
-        todo!()
+        let actual: List<SIZE, i64, false> = List::try_from(vec![1,2,3]).unwrap();
+        
+        let expected = List {
+            list: CyclicList {
+                list: [Some(1), Some(2), Some(3), None, None],
+                start: 0,
+                end: 2,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
     
     #[test]
     fn equal_to_list(){
-        todo!()
+        let actual: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        
+        let expected = List {
+            list: CyclicList {
+                list: [Some(1), Some(2), Some(3), Some(4), Some(5)],
+                start: 0,
+                end: 4,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
 
     #[test]
     fn no_overflow(){
-        todo!()
+        let actual: Result<List<SIZE, i64, false>, Error> = List::try_from(vec![1,2,3,4,5,6]);
+
+        assert_eq!(Err(Error::Overflow), actual)
     }
 
     #[test]
     fn overflow(){
-        todo!()
+        let actual: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5,6]).unwrap();
+
+        let expected = List {
+            list: CyclicList {
+                list: [Some(6), Some(2), Some(3), Some(4), Some(5)],
+                start: 1,
+                end: 0,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
 }
 
 mod try_from_linked_list{
+    use std::collections::LinkedList;
+
+    use crate::{list::List, CyclicList, error::Error};
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::try_from(LinkedList::from([])).unwrap();
+
+        assert_eq!(list, List::default());
     }
     
     #[test]
     fn smaller_than_list(){
-        todo!()
+        let actual: List<SIZE, i64, false> = List::try_from(LinkedList::from([1,2,3])).unwrap();
+        
+        let expected = List {
+            list: CyclicList {
+                list: [Some(1), Some(2), Some(3), None, None],
+                start: 0,
+                end: 2,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
     
     #[test]
     fn equal_to_list(){
-        todo!()
+        let actual: List<SIZE, i64, false> = List::try_from(LinkedList::from([1,2,3,4,5])).unwrap();
+        
+        let expected = List {
+            list: CyclicList {
+                list: [Some(1), Some(2), Some(3), Some(4), Some(5)],
+                start: 0,
+                end: 4,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
 
     #[test]
     fn no_overflow(){
-        todo!()
+        let actual: Result<List<SIZE, i64, false>, Error> = List::try_from(LinkedList::from([1,2,3,4,5,6]));
+
+        assert_eq!(Err(Error::Overflow), actual)
     }
 
     #[test]
     fn overflow(){
-        todo!()
+        let actual: List<SIZE, i64, true> = List::try_from(LinkedList::from([1,2,3,4,5,6])).unwrap();
+
+        let expected = List {
+            list: CyclicList {
+                list: [Some(6), Some(2), Some(3), Some(4), Some(5)],
+                start: 1,
+                end: 0,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
 }
 
 mod try_from_iter{
+    use crate::{list::List, CyclicList, error::Error};
+
+    const SIZE: usize = 5;
+
     #[test]
     fn empty(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::try_from(Box::new(vec![].into_iter()) as Box<dyn Iterator<Item = i64>>).unwrap();
+
+        assert_eq!(list, List::default());
     }
     
     #[test]
     fn smaller_than_list(){
-        todo!()
+        let actual: List<SIZE, i64, false> = List::try_from(Box::new(vec![1i64,2i64,3i64].into_iter()) as Box<dyn Iterator<Item = i64>>).unwrap();
+        
+        let expected = List {
+            list: CyclicList {
+                list: [Some(1), Some(2), Some(3), None, None],
+                start: 0,
+                end: 2,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
     
     #[test]
     fn equal_to_list(){
-        todo!()
+        let actual: List<SIZE, i64, false> = List::try_from(Box::new(vec![1i64,2i64,3i64,4i64,5i64].into_iter()) as Box<dyn Iterator<Item = i64>>).unwrap();
+        
+        let expected = List {
+            list: CyclicList {
+                list: [Some(1), Some(2), Some(3), Some(4), Some(5)],
+                start: 0,
+                end: 4,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
 
     #[test]
     fn no_overflow(){
-        todo!()
+        let actual: Result<List<SIZE, i64, false>, Error> = List::try_from(Box::new(vec![1i64,2i64,3i64,4i64,5i64,6i64].into_iter()) as Box<dyn Iterator<Item = i64>>);
+
+        assert_eq!(Err(Error::Overflow), actual)
     }
 
     #[test]
     fn overflow(){
-        todo!()
+        let actual: List<SIZE, i64, true> = List::try_from(Box::new(vec![1i64,2i64,3i64,4i64,5i64,6i64].into_iter()) as Box<dyn Iterator<Item = i64>>).unwrap();
+
+        let expected = List {
+            list: CyclicList {
+                list: [Some(6), Some(2), Some(3), Some(4), Some(5)],
+                start: 1,
+                end: 0,
+                empty: false
+            }
+        };
+
+        assert_eq!(actual, expected);
     }
 }
 
 mod from_array{
+    use crate::{list::List};
+
+    const SIZE: usize = 5;
     #[test]
     fn fill(){
-        todo!()
+        let list: List<SIZE, i64, false> = List::from([1,2,3,4,5]);
+
+        assert_eq!(list, List::try_from(vec![1,2,3,4,5]).unwrap());
     }
 }
 
 mod from_iter{
+    use crate::{list::List};
+
+    const SIZE: usize = 5;
     #[test]
-    fn smaller_overflow(){
-        todo!()
+    fn smaller_than_list(){
+        let list: List<SIZE, i64, false> = vec![1i32,2i32]
+            .iter()
+            .map(|val| *val as i64)
+            .collect();
+        
+        assert_eq!(list, List::try_from(vec![1,2]).unwrap());
     }
 
     #[test]
-    fn smaller_no_overflow(){
-        todo!()
+    fn equal_to_list(){
+        let list: List<SIZE, i64, false> = vec![1i32,2i32,3i32,4i32,5i32]
+            .iter()
+            .map(|val| *val as i64)
+            .collect();
+        
+        assert_eq!(list, List::try_from(vec![1,2,3,4,5]).unwrap());
     }
 
     #[test]
-    fn greater_overflow(){
-        todo!()
+    fn greater_than_list_with_overflow(){
+        let list: List<SIZE, i64, false> = vec![1i32,2i32,3i32,4i32,5i32, 5i32]
+            .iter()
+            .map(|val| *val as i64)
+            .collect();
+        
+        assert_eq!(list, List::try_from(vec![2,3,4,5,6]).unwrap());
     }
 
     #[test]
+    #[should_panic(expected="Overflow")]
     fn greater_no_overflow(){
-        todo!()
+        let _list: List<SIZE, i64, false> = vec![1i32,2i32,3i32,4i32,5i32, 5i32]
+            .iter()
+            .map(|val| *val as i64)
+            .collect();
     }
 }
 
 mod swap_write_over{
+    use crate::{list::List, Error};
+
+    const SIZE: usize = 5;
 
     #[test]
     fn true_to_false() {
-        todo!()
+        let list: List<SIZE, i64, true> = List::from([1,2,3,4,5]);
+
+        let mut list: List<SIZE, i64, false> = list.into();
+
+        assert_eq!(list.push_back(6), Err(Error::Overflow))
     }
 
     #[test]
     fn false_to_true() {
-        todo!()
+        let list: List<SIZE, i64, false> = List::from([1,2,3,4,5]);
+
+        let mut list: List<SIZE, i64, true> = list.into();
+
+        assert!(list.push_back(6).is_ok())
     }
 }
