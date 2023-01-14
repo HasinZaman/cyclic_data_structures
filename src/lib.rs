@@ -125,10 +125,15 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> Display for CyclicList<SIZE, 
         }
 
         let mut str = String::new();
-        for i in 0..(self.list.len()-1) {
-            str.push_str(&format!("{},", self[i].as_ref().unwrap()));
-        };
-        str.push_str(&format!("{}", self[self.list.len()-1].as_ref().unwrap()));
+
+        let mut pointer = self.start;
+
+        while pointer != self.end {
+            str.push_str(&format!("{}, ", self[pointer].as_ref().unwrap()));
+            pointer = (pointer + 1) % SIZE;
+        }
+        
+        str.push_str(&format!("{}", self[self.end].as_ref().unwrap()));
 
         write!(f, "[{}]", str)
     }
@@ -162,21 +167,21 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> Index<usize> for CyclicList<S
     type Output = Option<T>;
 
     fn index(&self, index: usize) -> &Self::Output {
-        if self.len() <= index{
-            panic!("{:?}", Error::IndexOutOfRange);
-        }
+        // if self.len() <= index{
+        //     panic!("{:?}", Error::IndexOutOfRange);
+        // }
 
-        &self.list[(self.start + index) % SIZE]
+        &self.list[index]
     }
 }
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> IndexMut<usize> for CyclicList<SIZE, T, WRITE_OVER> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if self.len() <= index{
-            panic!("{:?}", Error::IndexOutOfRange);
-        }
+        // if self.len() <= index{
+        //     panic!("{:?}", Error::IndexOutOfRange);
+        // }
 
-        &mut self.list[(self.start + index) % SIZE]
+        &mut self.list[index]
     }
 }
 
