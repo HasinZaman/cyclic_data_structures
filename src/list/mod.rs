@@ -16,6 +16,17 @@ pub struct List<const SIZE: usize, T: Sized, const WRITE_OVER: bool>{
 }
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
+    /// Returns the number of elements in the list
+    /// 
+    /// ```rust
+    /// let mut list: List<SIZE, i64, false>  = List::default();
+    /// 
+    /// assert_eq!(list.len(), 0);
+    /// 
+    /// assert!(list.push_back(1).is_ok());
+    /// 
+    /// assert_eq!(list.len(), 1);
+    /// ```
     pub fn len(&self) -> usize {
         self.list.len()
     }
@@ -90,7 +101,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
 
         match index {
             ..=-1 => {
-                return Some(&self[-1*((-1 * index - 1) % self.len() as isize - 1)])
+                return Some(&self[-1*((index + 1).abs() % self.len() as isize) - 1])
             },
             _ => {
                 return Some(&self[index % self.len() as isize])
@@ -110,10 +121,10 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         }
 
         let len = self.len() as isize;
-        
+
         match index {
             ..=-1 => {
-                return Some(&mut self[-1*((-1 * index - 1) % len - 1)])
+                return Some(&mut self[-1*((index + 1).abs() % len as isize) - 1])
             },
             _ => {
                 return Some(&mut self[index % len])
@@ -204,7 +215,7 @@ impl<const SIZE: usize, T, const W: bool> Index<usize> for List<SIZE, T, W> {
             panic!("{:?}", Error::IndexOutOfRange);
         }
         
-        self.list[(SIZE + index) % SIZE].as_ref().unwrap()
+        self.list[(self.list.start + index) % SIZE].as_ref().unwrap()
     }
 }
 
@@ -278,14 +289,14 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<LinkedList<T>> f
     type Error = Error;
 
     fn try_from(value: LinkedList<T>) -> Result<Self, Self::Error> {
-        if value.len() < LIST_SIZE && !WRITE_OVER {
+        if LIST_SIZE < value.len() && !WRITE_OVER {
             return Err(Error::Overflow)
         }
 
         let mut list = Self::default();
 
         for element in value{
-            list.push_front(element).unwrap();
+            list.push_back(element).unwrap();
         }
 
         Ok(list)
@@ -312,7 +323,7 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Box<dyn Iterator
         let mut list = Self::default();
 
         for element in value{
-            if let Err(err) = list.push_front(element) {
+            if let Err(err) = list.push_back(element) {
                 return Err(err);
             }
         }
@@ -320,7 +331,6 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Box<dyn Iterator
         Ok(list)
     }
 }
-
 
 impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> From<[T; LIST_SIZE]> for List<LIST_SIZE, T, WRITE_OVER> {
     fn from(value: [T; LIST_SIZE]) -> Self {
