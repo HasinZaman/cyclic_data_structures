@@ -102,16 +102,19 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVE
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> PartialEq for CyclicList<SIZE, T, WRITE_OVER> where T: PartialEq {
     fn eq(&self, other: &Self) -> bool {
-
-        
         if self.len() != other.len() {
             return false;
         }
 
-        for i1 in 0..self.len() {
-            if self[i1] != other[i1] {
+        let mut p1 = self.start;
+        let mut p2= other.start;
+        while (p1, p2) != (self.end, other.end) {
+            if self[p1] != other[p2] {
                 return false;
             }
+
+            p1 = (p1 + 1) % SIZE;
+            p2 = (p2 + 1) % SIZE;
         }
 
         return true
