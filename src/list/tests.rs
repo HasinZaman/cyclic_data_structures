@@ -29,7 +29,7 @@ mod len{
         for i in 0..10 {
             assert!(list.push_back(i).is_ok());
 
-            assert_eq!(list.len(), min(i as usize, SIZE));
+            assert_eq!(list.len(), min(i as usize + 1, SIZE));
         }
     }
 
@@ -50,7 +50,7 @@ mod len{
         for i in 0..10 {
             assert!(list.push_front(i).is_ok());
 
-            assert_eq!(list.len(), min(i as usize, SIZE));
+            assert_eq!(list.len(), min(i as usize + 1, SIZE));
         }
     }
 }
@@ -85,55 +85,135 @@ mod insert_at{
 }
 
 mod push_back{
-    use std::cmp::min;
-
-    use crate::{list::List, error::Error};
+    use crate::{list::List, error::Error, CyclicList};
 
     const SIZE: usize = 5;
 
     #[test]
     fn empty(){
         let mut list: List<SIZE, i64, false> = List::default();
+        let expect = List{
+            list: CyclicList{
+                list: [None, None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: true,
+            },
+        };
+        assert_eq!(list, expect);
 
         assert!(list.push_back(1).is_ok());
-        assert_eq!(list, vec![1].try_into().unwrap());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
     }
 
     #[test]
     fn fill(){
         let mut list: List<SIZE, i64, false> = List::default();
-        let mut expected = vec![];
 
-        for i in 0..SIZE{
-            assert!(list.push_back(i as i64).is_ok());
-            expected.push(i as i64);
+        let expect = List{
+            list: CyclicList{
+                list: [None, None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: true,
+            },
+        };
+        assert_eq!(list, expect);
 
+        assert!(list.push_back(1).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
 
-            assert_eq!(list.len(), i + 1);
-            assert_eq!(list, expected.clone().try_into().unwrap());
-        }
+        assert!(list.push_back(2).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), Some(2), None, None, None],
+                start: 0,
+                end: 1,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
+
+        assert!(list.push_back(3).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), Some(2), Some(3), None, None],
+                start: 0,
+                end: 2,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
+        
+        assert!(list.push_back(4).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), Some(2), Some(3), Some(4), None],
+                start: 0,
+                end: 3,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
+
+        assert!(list.push_back(5).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), Some(2), Some(3), Some(4), Some(5)],
+                start: 0,
+                end: 4,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
     }
 
     #[test]
     fn overflow(){
         let mut list: List<SIZE, i64, true> = List::default();
-        let mut expected = vec![];
+        
+        
+        assert!(list.push_back(1).is_ok());
 
-        for i in 0..SIZE+1{
-            assert!(list.push_back(i as i64).is_ok());
-            match i {
-                0..=SIZE => {
-                    expected.push(i as i64);
-                }
-                _=> {
-                    expected.remove(0);
-                    expected.push(i as i64);
-                }
-            }
-            
-            assert_eq!(list.len(), min(i + 1, SIZE));
-            assert_eq!(list, expected.clone().try_into().unwrap());
-        }
+        
+        assert!(list.push_back(2).is_ok());
+
+        
+        assert!(list.push_back(3).is_ok());
+
+        
+        assert!(list.push_back(4).is_ok());
+
+        
+        assert!(list.push_back(5).is_ok());
+
+        println!("{}->{}", list.list.end, list.list.increment_end());
+        assert!(list.push_back(6).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(6), Some(2), Some(3), Some(4), Some(5)],
+                start: 1,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
     }
 
     #[test]
@@ -147,53 +227,126 @@ mod push_back{
 mod push_front{
     use std::cmp::min;
 
-    use crate::{list::List, error::Error};
+    use crate::{list::List, error::Error, CyclicList};
 
     const SIZE: usize = 5;
 
     #[test]
     fn empty(){
         let mut list: List<SIZE, i64, false> = List::default();
+        let expect = List{
+            list: CyclicList{
+                list: [None, None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: true,
+            },
+        };
+        assert_eq!(list, expect);
 
         assert!(list.push_front(1).is_ok());
-        assert_eq!(list, vec![1].try_into().unwrap());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
     }
 
     #[test]
     fn fill(){
         let mut list: List<SIZE, i64, false> = List::default();
-        let mut expected = vec![];
+        
+        let expect = List{
+            list: CyclicList{
+                list: [None, None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: true,
+            },
+        };
+        assert_eq!(list, expect);
 
-        for i in 0..SIZE{
-            assert!(list.push_front(i as i64).is_ok());
-            expected.insert(0, i as i64);
+        assert!(list.push_front(1).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), None, None, None, None],
+                start: 0,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
 
-
-            assert_eq!(list.len(), i + 1);
-            assert_eq!(list, expected.clone().try_into().unwrap());
-        }
+        assert!(list.push_front(2).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), None, None, None, Some(2)],
+                start: 4,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
+        
+        assert!(list.push_front(3).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), None, None, Some(3), Some(2)],
+                start: 3,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
+        
+        assert!(list.push_front(4).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), None, Some(4), Some(3), Some(2)],
+                start: 2,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
+        
+        assert!(list.push_front(5).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(1), Some(5), Some(4), Some(3), Some(2)],
+                start: 1,
+                end: 0,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
     }
 
     #[test]
     fn overflow(){
         let mut list: List<SIZE, i64, true> = List::default();
-        let mut expected = vec![];
+        
+        assert!(list.push_front(1).is_ok());
+        assert!(list.push_front(2).is_ok());
+        assert!(list.push_front(3).is_ok());
+        assert!(list.push_front(4).is_ok());
+        assert!(list.push_front(5).is_ok());
 
-        for i in 0..SIZE+1{
-            assert!(list.push_front(i as i64).is_ok());
-            match i {
-                0..=SIZE => {
-                    expected.push(i as i64);
-                }
-                _=> {
-                    expected.pop();
-                    expected.push(i as i64);
-                }
-            }
-            
-            assert_eq!(list.len(), min(i + 1, SIZE));
-            assert_eq!(list, expected.clone().try_into().unwrap());
-        }
+        
+        assert!(list.push_front(6).is_ok());
+        let expect = List{
+            list: CyclicList{
+                list: [Some(6), Some(5), Some(4), Some(3), Some(2)],
+                start: 0,
+                end: 4,
+                empty: false,
+            },
+        };
+        assert_eq!(list, expect);
     }
 
     #[test]
@@ -787,6 +940,14 @@ mod display{
 
         assert_eq!(actual, "[]");
     }
+    #[test]
+    fn one_element(){
+        let list: List<SIZE, i64, false> = List::try_from(vec![1]).unwrap();
+
+        let actual = list.to_string();
+
+        assert_eq!(actual, "[1]");
+    }
 
     #[test]
     fn partially_filled(){
@@ -794,7 +955,7 @@ mod display{
 
         let actual = list.to_string();
 
-        assert_eq!(actual, "[1,2,3]");
+        assert_eq!(actual, "[1, 2, 3]");
     }
 
     #[test]
@@ -803,18 +964,16 @@ mod display{
 
         let actual = list.to_string();
 
-        assert_eq!(actual, "[1,2,3,4,5]");
+        assert_eq!(actual, "[1, 2, 3, 4, 5]");
     }
 
     #[test]
     fn overflow(){
-        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
-
-        assert!(list.push_back(6).is_ok());
+        let list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5, 6]).unwrap();
 
         let actual = list.to_string();
 
-        assert_eq!(actual, "[2,3,4,5,6]");
+        assert_eq!(actual, "[2, 3, 4, 5, 6]");
     }
 }
 
@@ -860,7 +1019,7 @@ mod debug{
 
         assert!(list.remove_front().is_some());
         let actual = format!("{list:?}");
-        assert_eq!("List { : CyclicList { list: [Some(6), None, Some(3), Some(4), Some(5)], start: 2, end: 0, size: 5 } }", actual);
+        assert_eq!("List { : CyclicList { list: [Some(6), None, Some(3), Some(4), Some(5)], start: 2, end: 0, size: 4 } }", actual);
     }
 }
 
