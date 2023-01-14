@@ -225,8 +225,6 @@ mod push_back{
 }
 
 mod push_front{
-    use std::cmp::min;
-
     use crate::{list::List, error::Error, CyclicList};
 
     const SIZE: usize = 5;
@@ -1566,7 +1564,7 @@ mod from_iter{
 }
 
 mod swap_write_over{
-    use crate::{list::List, Error};
+    use crate::{list::List, error::Error};
 
     const SIZE: usize = 5;
 
