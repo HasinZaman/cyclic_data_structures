@@ -20,10 +20,10 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         self.list.len()
     }
 
-    pub fn insert_at(&mut self, elem: T, index: usize) -> Result<&mut Self, Error> where T: Clone {
+    // pub fn insert_at(&mut self, elem: T, index: usize) -> Result<&mut Self, Error> where T: Clone {
         
-        todo!();
-    }
+    //     todo!();
+    // }
 
     pub fn push_back(&mut self, elem: T) -> Result<&mut Self, Error> {
         if self.len() + 1 > SIZE && !WRITE_OVER {
@@ -167,10 +167,10 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         Some(value.unwrap())
     }
 
-    pub fn remove_at(&mut self, index: usize) -> Result<T, Error> where T: Clone {
+    // pub fn remove_at(&mut self, index: usize) -> Result<T, Error> where T: Clone {
         
-        todo!();
-    }
+    //     todo!();
+    // }
 
     pub fn iter(&self) -> Iter<SIZE, T, WRITE_OVER> where Self: Sized {
         Iter::new(self)

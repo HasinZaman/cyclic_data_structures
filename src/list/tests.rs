@@ -55,34 +55,34 @@ mod len{
     }
 }
 
-mod insert_at{
-    const _SIZE: usize = 5;
+// mod insert_at{
+//     const _SIZE: usize = 5;
     
-    #[test]
-    fn push_back() {
-        todo!();
-    }
+//     #[test]
+//     fn push_back() {
+//         todo!();
+//     }
     
-    #[test]
-    fn push_front() {
-        todo!();
-    }
+//     #[test]
+//     fn push_front() {
+//         todo!();
+//     }
 
-    #[test]
-    fn insert_middle() {
-        todo!();
-    }
+//     #[test]
+//     fn insert_middle() {
+//         todo!();
+//     }
 
-    #[test]
-    fn no_overflow(){
-        todo!();
-    }
+//     #[test]
+//     fn no_overflow(){
+//         todo!();
+//     }
 
-    #[test]
-    fn index_out_of_range(){
-        todo!();
-    }
-}
+//     #[test]
+//     fn index_out_of_range(){
+//         todo!();
+//     }
+// }
 
 mod push_back{
     use crate::{list::List, error::Error, CyclicList};
@@ -694,27 +694,27 @@ mod remove_front{
     }
 }
 
-mod remove_at{
-    #[test]
-    fn empty(){
-        todo!()
-    }
+// mod remove_at{
+//     #[test]
+//     fn empty(){
+//         todo!()
+//     }
 
-    #[test]
-    fn remove_middle(){
-        todo!()
-    }
+//     #[test]
+//     fn remove_middle(){
+//         todo!()
+//     }
 
-    #[test]
-    fn remove_front(){
-        todo!()
-    }
+//     #[test]
+//     fn remove_front(){
+//         todo!()
+//     }
 
-    #[test]
-    fn remove_back(){
-        todo!()
-    }
-}
+//     #[test]
+//     fn remove_back(){
+//         todo!()
+//     }
+// }
 
 mod iter{
     use crate::list::List;
