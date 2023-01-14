@@ -565,11 +565,11 @@ mod get_mut{
 
         assert!(list.push_back(5).is_ok());
         println!("{:?}", list);
-        assert_eq!(list.get_mut(-1), Some(&mut 4));
-        assert_eq!(list.get_mut(-2), Some(&mut 3));
-        assert_eq!(list.get_mut(-3), Some(&mut 2));
-        assert_eq!(list.get_mut(-4), Some(&mut 1));
-        assert_eq!(list.get_mut(-5), Some(&mut 5));
+        assert_eq!(list.get_mut(-1), Some(&mut 5));
+        assert_eq!(list.get_mut(-2), Some(&mut 4));
+        assert_eq!(list.get_mut(-3), Some(&mut 3));
+        assert_eq!(list.get_mut(-4), Some(&mut 2));
+        assert_eq!(list.get_mut(-5), Some(&mut 1));
     }
 
     #[test]
@@ -614,15 +614,19 @@ mod get_mut{
 
         *list.get_mut(0).unwrap() = 4;
 
-        assert_eq!(list.get(0), Some(&4));
+        assert_eq!(list[0usize], 4);
         
         *list.get_mut(-1).unwrap() = 5;
 
-        assert_eq!(list.get(-1), Some(&5));
+        assert_eq!(list[3usize], 5);
         
-        *list.get_mut(4 + list.len() as isize).unwrap() = 6;
+        *list.get_mut(-4).unwrap() = 6;
 
-        assert_eq!(list.get(-1), Some(&6));
+        assert_eq!(list[0usize], 6);
+        
+        *list.get_mut(3 + list.len() as isize).unwrap() = 7;
+
+        assert_eq!(list[3usize], 7);
     }
 }
 
@@ -747,12 +751,7 @@ mod iter{
             assert_eq!(actual, expected);
         }
 
-        if let (None, None) = (actual.next(), expected.next()) {
-            assert!(true);
-        }
-        else {
-            assert!(false);
-        }
+        assert_eq!((None, None), (actual.next(), expected.next()));
     }
 
     #[test]
@@ -776,7 +775,7 @@ mod iter{
     #[test]
     fn iter_overflow(){
         let expected: Vec<i64>= vec![3,4,5,6,7];
-        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
         assert!(list.push_back(6).is_ok());
         assert!(list.push_back(7).is_ok());
@@ -788,18 +787,12 @@ mod iter{
             assert_eq!(actual, expected);
         }
 
-        if let (None, None) = (actual.next(), expected.next()) {
-            assert!(true);
-        }
-        else {
-            assert!(false);
-        }
-
+        assert_eq!((None, None), (actual.next(), expected.next()));
     }
 
     #[test]
     fn iter_overflow_size(){
-        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
         
         assert!(list.push_back(6).is_ok());
         assert!(list.push_back(7).is_ok());
@@ -850,12 +843,7 @@ mod iter_mut{
             assert_eq!(actual, expected);
         }
 
-        if let (None, None) = (actual.next(), expected.next()) {
-            assert!(true);
-        }
-        else {
-            assert!(false);
-        }
+        assert_eq!((None, None), (actual.next(), expected.next()));
     }
 
     #[test]
@@ -879,7 +867,7 @@ mod iter_mut{
     #[test]
     fn iter_overflow(){
         let expected: Vec<i64>= vec![3,4,5,6,7];
-        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
         assert!(list.push_back(6).is_ok());
         assert!(list.push_back(7).is_ok());
@@ -891,18 +879,12 @@ mod iter_mut{
             assert_eq!(actual, expected);
         }
 
-        if let (None, None) = (actual.next(), expected.next()) {
-            assert!(true);
-        }
-        else {
-            assert!(false);
-        }
-
+        assert_eq!((None, None), (actual.next(), expected.next()));
     }
 
     #[test]
     fn iter_overflow_size(){
-        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
         
         assert!(list.push_back(6).is_ok());
         assert!(list.push_back(7).is_ok());
@@ -1158,13 +1140,13 @@ mod index{
         assert_eq!(list[3usize], 4);
         assert_eq!(list[4usize], 5);
 
-        assert_eq!(list[-1isize], 1);
-        assert_eq!(list[-2isize], 2);
+        assert_eq!(list[-1isize], 5);
+        assert_eq!(list[-2isize], 4);
         assert_eq!(list[-3isize], 3);
-        assert_eq!(list[-4isize], 4);
-        assert_eq!(list[-5isize], 5);
+        assert_eq!(list[-4isize], 2);
+        assert_eq!(list[-5isize], 1);
 
-        assert!(list.remove_back().is_some());
+        assert!(list.remove_front().is_some());
         
         println!("{:?}", list);
         assert_eq!(list[0usize], 2);
@@ -1172,10 +1154,10 @@ mod index{
         assert_eq!(list[2usize], 4);
         assert_eq!(list[3usize], 5);
         
-        assert_eq!(list[-1isize], 2);
-        assert_eq!(list[-2isize], 3);
-        assert_eq!(list[-3isize], 4);
-        assert_eq!(list[-4isize], 5);
+        assert_eq!(list[-1isize], 5);
+        assert_eq!(list[-2isize], 4);
+        assert_eq!(list[-3isize], 3);
+        assert_eq!(list[-4isize], 2);
     }
 }
 
@@ -1453,7 +1435,12 @@ mod try_from_iter{
     
     #[test]
     fn smaller_than_list(){
-        let actual: List<SIZE, i64, false> = List::try_from(Box::new(vec![1i64,2i64,3i64].into_iter()) as Box<dyn Iterator<Item = i64>>).unwrap();
+        let actual: List<SIZE, i64, false> = List::try_from(
+            Box::new(
+                vec![1i64,2i64,3i64]
+                    .into_iter()
+            ) as Box<dyn Iterator<Item = i64>>
+        ).unwrap();
         
         let expected = List {
             list: CyclicList {
@@ -1469,7 +1456,12 @@ mod try_from_iter{
     
     #[test]
     fn equal_to_list(){
-        let actual: List<SIZE, i64, false> = List::try_from(Box::new(vec![1i64,2i64,3i64,4i64,5i64].into_iter()) as Box<dyn Iterator<Item = i64>>).unwrap();
+        let actual: List<SIZE, i64, false> = List::try_from(
+            Box::new(
+                vec![1i64,2i64,3i64,4i64,5i64]
+                    .into_iter()
+            ) as Box<dyn Iterator<Item = i64>>
+        ).unwrap();
         
         let expected = List {
             list: CyclicList {
@@ -1485,14 +1477,24 @@ mod try_from_iter{
 
     #[test]
     fn no_overflow(){
-        let actual: Result<List<SIZE, i64, false>, Error> = List::try_from(Box::new(vec![1i64,2i64,3i64,4i64,5i64,6i64].into_iter()) as Box<dyn Iterator<Item = i64>>);
+        let actual: Result<List<SIZE, i64, false>, Error> = List::try_from(
+            Box::new(
+                vec![1i64,2i64,3i64,4i64,5i64,6i64]
+                    .into_iter()
+            ) as Box<dyn Iterator<Item = i64>>
+        );
 
         assert_eq!(Err(Error::Overflow), actual)
     }
 
     #[test]
     fn overflow(){
-        let actual: List<SIZE, i64, true> = List::try_from(Box::new(vec![1i64,2i64,3i64,4i64,5i64,6i64].into_iter()) as Box<dyn Iterator<Item = i64>>).unwrap();
+        let actual: List<SIZE, i64, true> = List::try_from(
+            Box::new(
+                vec![1i64,2i64,3i64,4i64,5i64,6i64]
+                    .into_iter()
+            ) as Box<dyn Iterator<Item = i64>>
+        ).unwrap();
 
         let expected = List {
             list: CyclicList {
@@ -1545,7 +1547,7 @@ mod from_iter{
 
     #[test]
     fn greater_than_list_with_overflow(){
-        let list: List<SIZE, i64, false> = vec![1i32,2i32,3i32,4i32,5i32, 5i32]
+        let list: List<SIZE, i64, true> = vec![1i32,2i32,3i32,4i32,5i32,6i32]
             .iter()
             .map(|val| *val as i64)
             .collect();
