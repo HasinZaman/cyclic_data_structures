@@ -83,20 +83,20 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVE
         (self.start+1)%SIZE
     }
     fn decrement_start(&self) -> usize {
-        if let Some(val) = self.start.checked_sub(1) {
-            return val
+        match self.start.checked_sub(1) {
+            Some(start) => start,
+            None => SIZE-1,
         }
-        SIZE-1
     }
 
     fn increment_end(&self) -> usize {
         (self.end+1)%SIZE
     }
     fn decrement_end(&self) -> usize {
-        if let Some(val) = self.end.checked_sub(1) {
-            return val
+        match self.end.checked_sub(1) {
+            Some(end) => end,
+            None => SIZE-1,
         }
-        SIZE-1
     }
 }
 
