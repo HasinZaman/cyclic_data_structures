@@ -19,7 +19,7 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> Iterator for Iter<'a, SIZ
 
     fn next(&mut self) -> Option<Self::Item> {
 
-        if self.len() > 0 {
+        if self.len() <= 0{
             return None;
         }
 
