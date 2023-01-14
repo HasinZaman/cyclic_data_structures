@@ -36,7 +36,7 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             },
             (_val, true) => {
                 panic!("How did i break the list");
-            }
+            },
             _ => {
                 self.list.end = self.list.increment_end();
 
@@ -77,7 +77,8 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
                 }
             },
         }
-        self.list[0] = Some(elem);
+        let start = self.list.start;
+        self.list[start] = Some(elem);
 
         Ok(self)
     }
@@ -87,17 +88,14 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
             return None
         }
 
-        let list_index : usize;
-
-        let len = self.len() as isize;
-        if 0 > index {
-            list_index = (len - ((-1 * index) % len)).try_into().unwrap();
+        match index {
+            ..=-1 => {
+                return Some(&self[-1*((-1 * index - 1) % self.len() as isize - 1)])
+            },
+            _ => {
+                return Some(&self[index % self.len() as isize])
+            }
         }
-        else {
-            list_index = (index % len).try_into().unwrap();
-        }
-
-        Some(&self.list[list_index].as_ref().unwrap())
     }
 
     /*
@@ -110,18 +108,17 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         if self.len() == 0 {
             return None
         }
-        let list_index : usize;
 
         let len = self.len() as isize;
-
-        if 0 > index {
-            list_index = (len - ((-1 * index) % len)).try_into().unwrap();
+        
+        match index {
+            ..=-1 => {
+                return Some(&mut self[-1*((-1 * index - 1) % len - 1)])
+            },
+            _ => {
+                return Some(&mut self[index % len])
+            }
         }
-        else {
-            list_index = (index % len).try_into().unwrap();
-        }
-
-        Some(self.list[list_index].as_mut().unwrap())
     }
 
     /*
@@ -199,17 +196,26 @@ impl<const S: usize, T, const W: bool> Debug for List<S, T, W> where T: Debug{
     }
 }
 
-impl<const S: usize, T, const W: bool> Index<usize> for List<S, T, W> {
+impl<const SIZE: usize, T, const W: bool> Index<usize> for List<SIZE, T, W> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
-        self.list[index].as_ref().unwrap()
+        if self.len() <= index {
+            panic!("{:?}", Error::IndexOutOfRange);
+        }
+        
+        self.list[(SIZE + index) % SIZE].as_ref().unwrap()
     }
 }
 
-impl<const S: usize, T, const W: bool> IndexMut<usize> for List<S, T, W> {
+impl<const SIZE: usize, T, const W: bool> IndexMut<usize> for List<SIZE, T, W> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        self.list[index].as_mut().unwrap()
+        if self.len() <= index {
+            panic!("{:?}", Error::IndexOutOfRange);
+        }
+
+        let start = self.list.start;
+        self.list[(start + index) % SIZE].as_mut().unwrap()
     }
 }
 
@@ -218,7 +224,7 @@ impl<const S: usize, T, const W: bool> Index<isize> for List<S, T, W> {
 
     fn index(&self, index: isize) -> &Self::Output {
         if 0 <= index {
-            return self.list[index as usize].as_ref().unwrap();
+            return &self[index as usize];
         }
 
         if self.len() < index.abs() as usize {
@@ -227,14 +233,14 @@ impl<const S: usize, T, const W: bool> Index<isize> for List<S, T, W> {
 
 
         //index exists between [-1*self.len(), -1]
-        self.list[self.len() - index.abs() as usize].as_ref().unwrap()
+        &self[self.len() - index.abs() as usize]
     }
 }
 
 impl<const S: usize, T, const W: bool> IndexMut<isize> for List<S, T, W> {
     fn index_mut(&mut self, index: isize) -> &mut Self::Output {
         if 0 <= index {
-            return self.list[index as usize].as_mut().unwrap();
+            return &mut self[index as usize];
         }
 
         if self.len() < index.abs() as usize {
@@ -244,7 +250,7 @@ impl<const S: usize, T, const W: bool> IndexMut<isize> for List<S, T, W> {
 
         //index exists between [-1*self.len(), -1]
         let len = self.len();
-        self.list[len - index.abs() as usize].as_mut().unwrap()
+        &mut self[len - index.abs() as usize]
     }
 }
 
@@ -252,7 +258,7 @@ impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Vec<T>> for List
     type Error = Error;
 
     fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
-        if value.len() < LIST_SIZE && !WRITE_OVER {
+        if LIST_SIZE < value.len() && !WRITE_OVER {
             return Err(Error::Overflow)
         }
 
