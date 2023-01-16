@@ -67,15 +67,15 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> CyclicList<SIZE, T, WRITE_OVE
         self.end - self.start + 1
     }
 
-    pub unsafe fn get_unchecked(&self, index: usize) -> &T {
+    pub unsafe fn get_unchecked(&self, index: usize) -> Option<&T> {
         unsafe {
-            self.list.get_unchecked(index).as_ref().unwrap()
+            self.list.get_unchecked(index).as_ref()
         }
     }
     
-    pub unsafe fn get_unchecked_mut(&mut self, index: usize) -> &mut T {
+    pub unsafe fn get_unchecked_mut(&mut self, index: usize) -> Option<&mut T> {
         unsafe {
-            self.list.get_unchecked_mut(index).as_mut().unwrap()
+            self.list.get_unchecked_mut(index).as_mut()
         }
     }
 

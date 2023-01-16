@@ -339,11 +339,14 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         }
     }
 
-    /*
-    pub unsafe fn get_unchecked(&self, _index: usize) -> &T {
-        todo!()
+    /// returns a reference to an element in the list at provided index of the underlying array. get_unchecked is faster than all the other retrieval methods - however, provides less safety & features in exchange.
+    /// 
+    /// # Returns
+    /// The method returns None if the underlying array has not value at the given index. Otherwise, the method returns a reference to the items at the array index.
+    pub unsafe fn get_unchecked(&self, index: usize) -> Option<&T> {
+        self.list.get_unchecked(index)
     }
-    */
+    
 
     /// returns a mutable reference to an element in the list at provided index.
     /// 
@@ -418,11 +421,14 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         }
     }
 
-    /*
-    pub unsafe fn get_unchecked_mut(&mut self, _index: usize) -> &T {
-        todo!()
+    /// returns a reference to an element in the list at provided index of the underlying array. get_unchecked is faster than all the other retrieval methods - however, provides less safety & features in exchange.
+    /// 
+    /// # Returns
+    /// The method returns None if the underlying array has not value at the given index. Otherwise, the method returns a reference to the items at the array index.
+    pub unsafe fn get_unchecked_mut(&mut self, index: usize) -> Option<&mut T> {
+        self.list.get_unchecked_mut(index)
     }
-    */
+    
 
     /// Removes the last element from the list and returns removed element. This occurs in `O(1)`
     ///
