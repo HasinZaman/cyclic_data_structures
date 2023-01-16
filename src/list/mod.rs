@@ -42,7 +42,7 @@ mod tests;
 /// 
 /// # Creating Lists
 /// 
-/// List can be created in a couple of ways.
+/// Lists can be created in a couple of ways.
 /// 
 /// 1. Empty list
 /// 
@@ -57,7 +57,7 @@ mod tests;
 /// ```
 /// 2. From Array
 /// 
-/// List can can also be from arrays. The maximum size of the list is the same size as the array. This is done using the [`From<[SIZE; T]`] trait implementation for List.
+/// List can also be from arrays. The maximum size of the list is the same size as the array. This is done using the [`From<[SIZE; T]`] trait implementation for List.
 /// 
 /// ```
 /// # use cyclic_data_types::list::List;
