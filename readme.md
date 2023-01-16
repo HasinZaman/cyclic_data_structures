@@ -18,3 +18,7 @@ Cyclic List Example
  └─────────────┘
 ```
 Note: Even though the diagram uses arrow to denote the relationship between nodes/elements; implying a linked node structure - however, the implementation in this crate uses arrays.
+
+### Stack
+
+The stack module contains a series of structs to create stacks and their utility functionalities.
