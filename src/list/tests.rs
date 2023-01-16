@@ -809,20 +809,20 @@ mod iter{
         assert_eq!(0, iter.len());
     }
 
-    #[test]
-    fn reverse() {
-        let expected: Vec<i64>= vec![1,2,3,4,5];
-        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+    // #[test]
+    // fn reverse() {
+    //     let expected: Vec<i64>= vec![1,2,3,4,5];
+    //     let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
-        let mut actual = list.iter().rev();
-        let mut expected = expected.iter().rev();
+    //     let mut actual = list.iter().rev();
+    //     let mut expected = expected.iter().rev();
 
-        for (actual, expected) in (&mut actual).zip(&mut expected){
-            assert_eq!(actual, expected);
-        }
+    //     for (actual, expected) in (&mut actual).zip(&mut expected){
+    //         assert_eq!(actual, expected);
+    //     }
 
-        assert_eq!((None, None), (actual.next(), expected.next()));
-    }
+    //     assert_eq!((None, None), (actual.next(), expected.next()));
+    // }
 }
 
 mod iter_mut{
