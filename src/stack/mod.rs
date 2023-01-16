@@ -1,4 +1,6 @@
 //! The list module contains a series of structs to create stacks and their utility functionalities using cyclic lists.
+//! 
+//! It is recommended to use [`Vec`] over [`Stack`] for most applications. As [`Vec`] has better - if not similar performance to the [`Stack`]. It is therefore, [`Stack`] should only be used when the stack should strictly be limited to a given size and or life convince of life features provided by the [`Stack`].
 
 use std::{fmt::{Display, Debug}, collections::LinkedList, ops::{Deref, DerefMut}};
 
@@ -49,10 +51,10 @@ mod tests;
 /// let stack: Stack<SIZE, i64, false> = [1i64,2i64,3i64,4i64,5i64].into();
 /// #
 /// # assert_eq!(stack.len(), 5);
-/// # assert_eq!(stack.read(5).unwrap(), &1i64);
-/// # assert_eq!(stack.read(4).unwrap(), &2i64);
-/// # assert_eq!(stack.read(3).unwrap(), &3i64);
-/// # assert_eq!(stack.read(2).unwrap(), &4i64);
+/// # assert_eq!(stack.read(4).unwrap(), &1i64);
+/// # assert_eq!(stack.read(3).unwrap(), &2i64);
+/// # assert_eq!(stack.read(2).unwrap(), &3i64);
+/// # assert_eq!(stack.read(1).unwrap(), &4i64);
 /// # assert_eq!(stack.read(0).unwrap(), &5i64);
 /// ```
 /// 
@@ -127,8 +129,8 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> Stack<SIZE, T, WRITE_OVER> {
     /// assert!(stack.push(2).is_ok());
     /// 
     /// # assert_eq!(stack.len(), 2);
-    /// # assert_eq!(stack.read(0).unwrap(), 2);
-    /// # assert_eq!(stack.read(1).unwrap(), 1);
+    /// # assert_eq!(stack.read(0).unwrap(), &2);
+    /// # assert_eq!(stack.read(1).unwrap(), &1);
     /// ```
     pub fn push(&mut self, elem: T) -> Result<&mut Self, Error>{
         match self.0.push_back(elem){
@@ -176,8 +178,8 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> Stack<SIZE, T, WRITE_OVER> {
     /// let mut stack: Stack<SIZE, i64, false> = vec![1,2].try_into().unwrap();
     /// 
     /// # assert_eq!(stack.len(), 2);
-    /// assert_eq!(stack.read(0).unwrap(), 2);
-    /// assert_eq!(stack.read(1).unwrap(), 1);
+    /// assert_eq!(stack.read(0).unwrap(), &2);
+    /// assert_eq!(stack.read(1).unwrap(), &1);
     /// ```
     /// 
     /// # Return
