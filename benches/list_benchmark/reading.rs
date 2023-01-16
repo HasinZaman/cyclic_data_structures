@@ -30,24 +30,24 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        $c.bench_function(
-            &format!("Cyclic List (no write_over) (no optimization) (iter) (back-front) - reading {}", $SIZE),
-            |b| {
-                let mut list: List<$SIZE, usize, false> = List::default();
-                for i in 0..$SIZE {
-                    let _ = list.push_back(black_box(i));
-                }
+        // $c.bench_function(
+        //     &format!("Cyclic List (no write_over) (no optimization) (iter) (back-front) - reading {}", $SIZE),
+        //     |b| {
+        //         let mut list: List<$SIZE, usize, false> = List::default();
+        //         for i in 0..$SIZE {
+        //             let _ = list.push_back(black_box(i));
+        //         }
 
-                b.iter(
-                    move || {
-                        let mut iter = list.iter().rev();
-                        while let Some(_) = black_box(iter.next()) {
+        //         b.iter(
+        //             move || {
+        //                 let mut iter = list.iter().rev();
+        //                 while let Some(_) = black_box(iter.next()) {
 
-                        }
-                    }
-                )
-            }
-        );
+        //                 }
+        //             }
+        //         )
+        //     }
+        // );
 
 
         $c.bench_function(
@@ -68,24 +68,24 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        $c.bench_function(
-            &format!("Cyclic List (write_over) (no optimization) (iter) (back-front) - reading {}", $SIZE),
-            |b| {
-                let mut list: List<$SIZE, usize, true> = List::default();
-                for i in 0..$SIZE {
-                    let _ = list.push_back(black_box(i));
-                }
+        // $c.bench_function(
+        //     &format!("Cyclic List (write_over) (no optimization) (iter) (back-front) - reading {}", $SIZE),
+        //     |b| {
+        //         let mut list: List<$SIZE, usize, true> = List::default();
+        //         for i in 0..$SIZE {
+        //             let _ = list.push_back(black_box(i));
+        //         }
 
-                b.iter(
-                    move || {
-                        let mut iter = list.iter().rev();
-                        while let Some(_) = black_box(iter.next()) {
+        //         b.iter(
+        //             move || {
+        //                 let mut iter = list.iter().rev();
+        //                 while let Some(_) = black_box(iter.next()) {
 
-                        }
-                    }
-                )
-            }
-        );
+        //                 }
+        //             }
+        //         )
+        //     }
+        // );
 
         //optimize
         $c.bench_function(
@@ -106,24 +106,24 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        $c.bench_function(
-            &format!("Cyclic List (no write_over) (optimization) (iter) (back-front) - reading {}", $SIZE),
-            |b| {
-                let mut list: List<$SIZE, usize, false> = List::default();
-                for i in 0..$SIZE {
-                    let _ = list.push_back(black_box(i));
-                }
+        // $c.bench_function(
+        //     &format!("Cyclic List (no write_over) (optimization) (iter) (back-front) - reading {}", $SIZE),
+        //     |b| {
+        //         let mut list: List<$SIZE, usize, false> = List::default();
+        //         for i in 0..$SIZE {
+        //             let _ = list.push_back(black_box(i));
+        //         }
 
-                b.iter(
-                    move || {
-                        let mut iter = list.iter().rev();
-                        while let Some(_) = iter.next() {
+        //         b.iter(
+        //             move || {
+        //                 let mut iter = list.iter().rev();
+        //                 while let Some(_) = iter.next() {
 
-                        }
-                    }
-                )
-            }
-        );
+        //                 }
+        //             }
+        //         )
+        //     }
+        // );
 
 
         $c.bench_function(
@@ -144,24 +144,24 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        $c.bench_function(
-            &format!("Cyclic List (write_over) (optimization) (iter) (back-front) - reading {}", $SIZE),
-            |b| {
-                let mut list: List<$SIZE, usize, true> = List::default();
-                for i in 0..$SIZE {
-                    let _ = list.push_back(black_box(i));
-                }
+        // $c.bench_function(
+        //     &format!("Cyclic List (write_over) (optimization) (iter) (back-front) - reading {}", $SIZE),
+        //     |b| {
+        //         let mut list: List<$SIZE, usize, true> = List::default();
+        //         for i in 0..$SIZE {
+        //             let _ = list.push_back(black_box(i));
+        //         }
 
-                b.iter(
-                    move || {
-                        let mut iter = list.iter().rev();
-                        while let Some(_) = iter.next() {
+        //         b.iter(
+        //             move || {
+        //                 let mut iter = list.iter().rev();
+        //                 while let Some(_) = iter.next() {
 
-                        }
-                    }
-                )
-            }
-        );
+        //                 }
+        //             }
+        //         )
+        //     }
+        // );
 
         //no optimize
         $c.bench_function(
