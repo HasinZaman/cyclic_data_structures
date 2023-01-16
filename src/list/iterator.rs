@@ -23,7 +23,7 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> Iterator for Iter<'a, SIZ
             return None;
         }
 
-        let tmp = self.list.get(self.pointer as isize);
+        let tmp = Some(&self.list[self.pointer]);
 
         self.pointer+=1;
 
@@ -34,5 +34,18 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> Iterator for Iter<'a, SIZ
 impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> ExactSizeIterator for Iter<'a, SIZE, T, WRITE_OVER> {
     fn len(&self) -> usize {
         self.list.len() - self.pointer
+    }
+}
+
+impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> DoubleEndedIterator for Iter<'a, SIZE, T, WRITE_OVER> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        match self.pointer.checked_sub(1) {
+            Some(val) => {
+                self.pointer = val;
+
+                Some(&self.list[self.pointer])
+            },
+            None => None,
+        }
     }
 }
