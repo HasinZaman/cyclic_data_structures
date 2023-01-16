@@ -4,6 +4,9 @@ use std::{fmt::{Display, Debug}, collections::LinkedList};
 
 use crate::{list::List, error::Error};
 
+#[cfg(test)]
+mod tests;
+
 /// `Stack` is the `struct` used to define the state of a stack using cyclic [`List`]
 /// 
 /// # Generics
