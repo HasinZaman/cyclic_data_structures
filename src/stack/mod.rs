@@ -42,47 +42,49 @@ mod tests;
 /// WRITE_OVER is a generic constant [^note] that is used to determine if elements should be over written on overflow
 /// [note]: [Generic Constraints](https://rust-lang.github.io/rfcs/2000-const-generics.html)
 #[derive(Default, PartialEq)]
-pub struct Stack<const SIZE: usize, T, const WRITE_OVER: bool> {
-    stack: List<SIZE, T, WRITE_OVER>
-}
+pub struct Stack<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>);
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> Stack<SIZE, T, WRITE_OVER> {
     pub fn len(&self) -> usize {
-        self.stack.len()
+        self.0.len()
     }
+
     pub fn push(&mut self, elem: T) -> Result<&mut Self, Error>{
-        match self.stack.push_back(elem){
+        match self.0.push_back(elem){
             Ok(_) => Ok(self),
             Err(err) => Err(err),
         }
     }
+    
     pub fn peek(&self) -> Option<&T> {
-        self.stack.get(-1)
+        self.0.get(-1)
     }
+    
     pub fn pop(&mut self) -> Option<T> {
-        self.stack.remove_back()
+        self.0.remove_back()
     }
+    
     pub fn read(&self, index: usize) -> Result<&T, Error> {
-        let len = self.stack.len();
+        let len = self.0.len();
 
         if len <= index {
             return Err(Error::IndexOutOfRange)
         }
 
-        return Ok(&self.stack[-1 * index as isize - 1])
+        return Ok(&self.0[-1 * index as isize - 1])
     }
 }
 
 impl<const S: usize, T, const W: bool> Display for Stack<S, T, W> where T: Display{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.stack)
+        write!(f, "{}", self.0)
     }
 }
 
 impl<const S: usize, T, const W: bool> Debug for Stack<S, T, W> where T: Debug{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Stack")
-            .field("", &self.stack)
+            .field("", &self.0)
             .finish()
     }
 }
@@ -91,19 +93,18 @@ impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Vec<T>> for Sta
     type Error = Error;
 
     fn try_from(value: Vec<T>) -> Result<Self, Self::Error> {
-        if STACK_SIZE < value.len() && !WRITE_OVER {
-            return Err(Error::Overflow)
-        }
-
-        let mut stack = Self::default();
-
-        for element in value{
-            if let Err(err) = stack.push(element) {
-                return Err(err);
-            }
-        }
-
-        Ok(stack)
+        Ok(
+            Stack(
+                {
+                    match value.try_into() {
+                        Ok(value) => value,
+                        Err(err) => {
+                            return Err(err)
+                        },
+                    }
+                }
+            )
+        )
     }
 }
 
@@ -111,29 +112,24 @@ impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<LinkedList<T>> 
     type Error = Error;
 
     fn try_from(value: LinkedList<T>) -> Result<Self, Self::Error> {
-        if STACK_SIZE < value.len() && !WRITE_OVER {
-            return Err(Error::Overflow)
-        }
-
-        let mut stack = Self::default();
-
-        for element in value{
-            stack.push(element).unwrap();
-        }
-
-        Ok(stack)
+        Ok(
+            Stack(
+                {
+                    match value.try_into() {
+                        Ok(value) => value,
+                        Err(err) => {
+                            return Err(err)
+                        },
+                    }
+                }
+            )
+        )
     }
 }
 
 impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> FromIterator<T> for Stack<STACK_SIZE, T, WRITE_OVER> where T: Default {
     fn from_iter<A: IntoIterator<Item = T>>(iter: A) -> Self {
-        let mut list :Stack<STACK_SIZE, T, WRITE_OVER> = Stack::default();
-
-        for elem in iter {
-            list.push(elem).unwrap();
-        }
-
-        list
+        Stack(iter.into_iter().collect())
     }
 }
 
@@ -142,46 +138,41 @@ impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> TryFrom<Box<dyn Iterato
     type Error = Error;
 
     fn try_from(value: Box<dyn Iterator<Item = T>>) -> Result<Self, Self::Error> {
-        let mut list = Self::default();
-
-        for element in value{
-            if let Err(err) = list.push(element) {
-                return Err(err);
-            }
-        }
-
-        Ok(list)
+        Ok(
+            Stack(
+                {
+                    match value.try_into() {
+                        Ok(value) => value,
+                        Err(err) => {
+                            return Err(err)
+                        },
+                    }
+                }
+            )
+        )
     }
 }
 
 impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> From<[T; STACK_SIZE]> for Stack<STACK_SIZE, T, WRITE_OVER> {
     fn from(value: [T; STACK_SIZE]) -> Self {
-        Stack{
-            stack: value.into(),
-        }
+        Stack(value.into())
     }
 }
 
 impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> From<List<STACK_SIZE, T, WRITE_OVER>> for Stack<STACK_SIZE, T, WRITE_OVER>{
     fn from(value: List<STACK_SIZE, T, WRITE_OVER>) -> Self {
-        Self {
-            stack: value 
-        }
+        Self(value)
     }
 }
 
 impl<const STACK_SIZE: usize, T> From<Stack<STACK_SIZE, T, true>> for Stack<STACK_SIZE, T, false> {
     fn from(value: Stack<STACK_SIZE, T, true>) -> Self {
-        Self{
-            stack: value.stack.into(),
-        }
+        Self(value.0.into())
     }
 }
 
 impl<const STACK_SIZE: usize, T> From<Stack<STACK_SIZE, T, false>> for Stack<STACK_SIZE, T, true> {
     fn from(value: Stack<STACK_SIZE, T, false>) -> Self {
-        Self{
-            stack: value.stack.into(),
-        }
+        Self(value.0.into())
     }
 }
