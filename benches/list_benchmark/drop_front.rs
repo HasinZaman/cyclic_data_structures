@@ -1,7 +1,6 @@
 use criterion::{black_box, Criterion};
 use cyclic_data_types::list::List;
 use std::collections::linked_list::LinkedList;
-use ringbuffer::{RingBuffer, RingBufferExt, RingBufferWrite};
 use smallvec::SmallVec;
 use circular_queue::CircularQueue;
 use arraydeque::{ArrayDeque, Wrapping};
@@ -119,7 +118,9 @@ macro_rules! list_drop_front_benchmark{
                 }
                 b.iter(
                     move || {
-                        let _ = black_box(list.pop_front());
+                        while list.len() > 0 {
+                            let _ = black_box(list.pop_front());
+                        }
                     }
                 )
             }
