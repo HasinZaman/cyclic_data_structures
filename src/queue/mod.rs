@@ -6,8 +6,8 @@ use std::{fmt::{Display, Debug}, collections::LinkedList, ops::{DerefMut, Deref}
 
 use crate::{list::List, error::Error};
 
-//#[derive(Default, PartialEq)]
-//pub struct PriorityQueue<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>);
+// #[derive(Default, PartialEq)]
+// struct PriorityQueue<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>) where T: PartialOrd + PartialEq;
 
 /// `Queue` is the `struct` used to define the state of a queue using cyclic [`List`]. As a result, the queue inherits the O(1) insertion and deletion for enqueuing & dequeuing.
 /// 
