@@ -42,7 +42,7 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> ExactSizeIterator for Ite
 //         match self.pointer.checked_sub(1) {
 //             Some(val) => {
 //                 self.pointer = val;
-
+//
 //                 Some(&self.list[self.pointer])
 //             },
 //             None => None,
@@ -66,18 +66,18 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> ExactSizeIterator for Ite
 
 // impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> Iterator for IterMut<'a, SIZE, T, WRITE_OVER> {
 //     type Item = &'a mut T;
-
+//
 //     fn next(&mut self) -> Option<Self::Item> {
 //         if self.len() <= 0{
 //             return None;
 //         }
-
-        
-
+//
+//     
+//
 //         let tmp = Some(&mut self.list[self.pointer]);
-
+//
 //         self.pointer+=1;
-
+//
 //         tmp
 //     }
 // }
