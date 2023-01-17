@@ -6,6 +6,9 @@ use std::{fmt::{Display, Debug}, collections::LinkedList, ops::{DerefMut, Deref}
 
 use crate::{list::List, error::Error};
 
+#[cfg(test)]
+mod tests;
+
 // #[derive(Default, PartialEq)]
 // struct PriorityQueue<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>) where T: PartialOrd + PartialEq;
 
