@@ -1,6 +1,13 @@
+//! The queue module contains a series of structs to create queues and their utility functionalities using cyclic lists.
+//! 
+//! As a result, the queue inherits the O(1) insertion and deletion for enqueuing & dequeuing.
+
 use std::{fmt::{Display, Debug}, collections::LinkedList, ops::{DerefMut, Deref}};
 
 use crate::{list::List, error::Error};
+
+//#[derive(Default, PartialEq)]
+//pub struct PriorityQueue<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>);
 
 /// `Queue` is the `struct` used to define the state of a queue using cyclic [`List`]. As a result, the queue inherits the O(1) insertion and deletion for enqueuing & dequeuing.
 /// 
