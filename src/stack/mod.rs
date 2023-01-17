@@ -1,6 +1,6 @@
-//! The list module contains a series of structs to create stacks and their utility functionalities using cyclic lists.
+//! The stack module contains a series of structs to create stacks and their utility functionalities using cyclic lists.
 //! 
-//! It is recommended to use [`Vec`] over [`Stack`] for most applications. As [`Vec`] has better - if not similar performance to the [`Stack`]. It is therefore, [`Stack`] should only be used when the stack should strictly be limited to a given size and or life convince of life features provided by the [`Stack`].
+//! It is recommended to use [`Vec`] over [`Stack`] for most applications. As [`Vec`] has better - if not similar performance to the [`Stack`]. It is therefore, [`Stack`] should only be used when the stack should strictly be limited to a given size and or convince of life features provided by the [`Stack`].
 
 use std::{fmt::{Display, Debug}, collections::LinkedList, ops::{Deref, DerefMut}};
 
@@ -10,6 +10,8 @@ use crate::{list::List, error::Error};
 mod tests;
 
 /// `Stack` is the `struct` used to define the state of a stack using cyclic [`List`]
+/// 
+/// *NOTE:* It is recommended to use [`Vec`] over [`Stack`] for most applications. As [`Vec`] has better - if not similar performance to the [`Stack`]. It is therefore, [`Stack`] should only be used when the stack should strictly be limited to a given size and or convince of life features provided by the [`Stack`].
 /// 
 /// # Generics
 /// List types are derived using 3 generics.
