@@ -9,7 +9,7 @@ use crate::{list::List, error::Error};
 #[cfg(test)]
 mod tests;
 
-/// `Stack` is the `struct` used to define the state of a stack using cyclic [`List`]
+/// `Stack` is the `struct` used to define the state of a stack using cyclic [`List`].
 /// 
 /// *NOTE:* It is recommended to use [`Vec`] over [`Stack`] for most applications. As [`Vec`] has better - if not similar performance to the [`Stack`]. It is therefore, [`Stack`] should only be used when the stack should strictly be limited to a given size and or convince of life features provided by the [`Stack`].
 /// 
@@ -26,14 +26,13 @@ mod tests;
 /// 
 /// 3. `const WRITE_OVER: bool>`
 /// 
-/// 
 /// # Creating Stacks
 /// 
 /// Stacks can be created in a couple of ways.
 /// 
 /// 1. Empty Stack
 /// 
-/// Empty Stack are created using the [`Default`] trait implementation for List.
+/// Empty Stack are created using the [`Default`] trait implementation for Queue.
 /// 
 /// ```
 /// # use cyclic_data_types::stack::Stack;
