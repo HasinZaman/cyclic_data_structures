@@ -2,6 +2,92 @@ use std::{fmt::{Display, Debug}, collections::LinkedList, ops::{DerefMut, Deref}
 
 use crate::{list::List, error::Error};
 
+/// `Queue` is the `struct` used to define the state of a queue using cyclic [`List`]. As a result, the queue inherits the O(1) insertion and deletion for enqueuing & dequeuing.
+/// 
+/// # Generics
+/// List types are derived using 3 generics.
+/// 
+/// 1. `const SIZE: usize`
+/// 
+/// SIZE is a generic constant [^note] that defines the maximum size of the queue
+/// 
+/// 2. `T: Sized`
+/// 
+/// T is the type of element stored in the queue
+/// 
+/// 3. `const WRITE_OVER: bool>`
+/// 
+/// # Creating Queue
+/// 
+/// Queue can be created in a couple of ways.
+/// 
+/// 1. Empty Queue
+/// 
+/// Empty Queue are created using the [`Default`] trait implementation for Queue.
+/// 
+/// ```
+/// # use cyclic_data_types::queue::Queue;
+/// # const SIZE: usize = 5;
+/// let queue: Queue<SIZE, i64, false> = Queue::default();
+/// 
+/// assert_eq!(queue.len(), 0);
+/// ```
+/// 
+/// 2. From Array
+/// 
+/// Queue can also be derived from arrays. The maximum size of the queue is the same size as the array. This is done using the [`From<[SIZE; T]`] trait implementation for List.
+/// 
+/// ```
+/// # use cyclic_data_types::queue::Queue;
+/// # const SIZE: usize = 5;
+/// let mut queue: Queue<SIZE, i64, false> = [1i64,2i64,3i64,4i64,5i64].into();
+/// #
+/// # assert_eq!(queue.len(), 5);
+/// # assert_eq!(queue.dequeue(), Some(1i64));
+/// # assert_eq!(queue.dequeue(), Some(2i64));
+/// # assert_eq!(queue.dequeue(), Some(3i64));
+/// # assert_eq!(queue.dequeue(), Some(4i64));
+/// # assert_eq!(queue.dequeue(), Some(5i64));
+/// # assert_eq!(queue.dequeue(), None);
+/// ```
+/// 
+/// 3. From Vectors, Linked Lists and Iterators
+/// 
+/// Since collections (Vectors, Linked Lists and Iterators) cannot guarantee a size at compile time - the conversion is not always guaranteed to succeed. This occurs when collection is larger than the queue variant. As a result, the new queue cannot be created without resulting in a [`Error::Overflow`]. This can be resolved by either making sure the collection is at max the same size as the queue variant or the cyclic list variant permits `WRITE_OVER`.
+/// 
+/// Therefore, the [`TryFrom`] trait implementation of queue must be used.
+/// 
+/// Example of a successful conversion
+/// ```
+/// # use cyclic_data_types::queue::Queue;
+/// const SIZE: usize = 5;
+/// let queue: Queue<SIZE, i64, false> = Queue::try_from(vec![1i64,2i64,3i64,4i64,5i64])
+///     .unwrap();
+/// #
+/// # assert_eq!(queue.len(), 5);
+/// # assert_eq!(queue, [1i64,2i64,3i64,4i64,5i64].into());
+/// ```
+/// ```
+/// # use cyclic_data_types::queue::Queue;
+/// const SIZE: usize = 5;
+/// let queue: Queue<SIZE, i64, true> = vec![1i64,2i64,3i64,4i64,5i64,6i64].try_into()
+///     .unwrap();
+/// #
+/// # assert_eq!(queue.len(), 5);
+/// # assert_eq!(queue, [2i64,3i64,4i64,5i64,6i64].into());
+/// ```
+/// Example of a failed conversion
+/// ```
+/// # use cyclic_data_types::queue::Queue;
+/// # use cyclic_data_types::error::Error;
+/// const SIZE: usize = 5;
+/// let queue: Result<Queue<SIZE, i64, false>, Error> = Queue::try_from(vec![1i64,2i64,3i64,4i64,5i64,6i64]);
+/// 
+/// assert_eq!(queue, Err(Error::Overflow))
+/// ```
+/// 
+/// WRITE_OVER is a generic constant [^note] that is used to determine if elements should be over written on overflow
+/// [note]: [Generic Constraints](https://rust-lang.github.io/rfcs/2000-const-generics.html)
 #[derive(Default, PartialEq)]
 pub struct Queue<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>);
 
