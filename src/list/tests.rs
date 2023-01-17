@@ -825,102 +825,102 @@ mod iter{
     // }
 }
 
-mod iter_mut{
-    use crate::list::List;
+// mod iter_mut{
+//     use crate::list::List;
 
-    const SIZE: usize = 5;
+//     const SIZE: usize = 5;
 
-    #[test]
-    fn empty(){
-        let mut list: List<SIZE, i64, false> = List::default();
+//     #[test]
+//     fn empty(){
+//         let mut list: List<SIZE, i64, false> = List::default();
 
-        let mut iter = list.iter_mut();
+//         let mut iter = list.iter_mut();
 
-        assert_eq!(None, iter.next());
+//         assert_eq!(None, iter.next());
 
         
-        let iter = list.iter_mut();
+//         let iter = list.iter_mut();
 
-        assert_eq!(0, iter.len());
-    }
+//         assert_eq!(0, iter.len());
+//     }
 
-    #[test]
-    fn iter(){
-        let expected: Vec<i64>= vec![1,2,3,4,5];
-        let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+//     #[test]
+//     fn iter(){
+//         let expected: Vec<i64>= vec![1,2,3,4,5];
+//         let list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
-        let mut actual = list.iter();
-        let mut expected = expected.iter();
+//         let mut actual = list.iter();
+//         let mut expected = expected.iter();
 
-        for (actual, expected) in (&mut actual).zip(&mut expected){
-            assert_eq!(actual, expected);
-        }
+//         for (actual, expected) in (&mut actual).zip(&mut expected){
+//             assert_eq!(actual, expected);
+//         }
 
-        assert_eq!((None, None), (actual.next(), expected.next()));
-    }
+//         assert_eq!((None, None), (actual.next(), expected.next()));
+//     }
 
-    #[test]
-    fn iter_size(){
-        let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
+//     #[test]
+//     fn iter_size(){
+//         let mut list: List<SIZE, i64, false> = List::try_from(vec![1,2,3,4,5]).unwrap();
         
-        let mut iter = list.iter_mut();
-        let mut i1 = SIZE;
+//         let mut iter = list.iter_mut();
+//         let mut i1 = SIZE;
 
 
-        assert_eq!(i1, iter.len());
+//         assert_eq!(i1, iter.len());
 
-        while let Some(_) = iter.next() {
-            i1 = i1 - 1;
+//         while let Some(_) = iter.next() {
+//             i1 = i1 - 1;
         
-            assert_eq!(i1, iter.len());
-        }
-        assert_eq!(0, iter.len());
-    }
+//             assert_eq!(i1, iter.len());
+//         }
+//         assert_eq!(0, iter.len());
+//     }
     
-    #[test]
-    fn iter_overflow(){
-        let expected: Vec<i64>= vec![3,4,5,6,7];
-        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+//     #[test]
+//     fn iter_overflow(){
+//         let expected: Vec<i64>= vec![3,4,5,6,7];
+//         let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
 
-        assert!(list.push_back(6).is_ok());
-        assert!(list.push_back(7).is_ok());
+//         assert!(list.push_back(6).is_ok());
+//         assert!(list.push_back(7).is_ok());
 
-        let mut actual = list.iter_mut();
-        let mut expected = expected.iter();
+//         let mut actual = list.iter_mut();
+//         let mut expected = expected.iter();
 
-        for (actual, expected) in (&mut actual).zip(&mut expected){
-            assert_eq!(actual, expected);
-        }
+//         for (actual, expected) in (&mut actual).zip(&mut expected){
+//             assert_eq!(actual, expected);
+//         }
 
-        assert_eq!((None, None), (actual.next(), expected.next()));
-    }
+//         assert_eq!((None, None), (actual.next(), expected.next()));
+//     }
 
-    #[test]
-    fn iter_overflow_size(){
-        let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
+//     #[test]
+//     fn iter_overflow_size(){
+//         let mut list: List<SIZE, i64, true> = List::try_from(vec![1,2,3,4,5]).unwrap();
         
-        assert!(list.push_back(6).is_ok());
-        assert!(list.push_back(7).is_ok());
+//         assert!(list.push_back(6).is_ok());
+//         assert!(list.push_back(7).is_ok());
         
-        let mut iter = list.iter_mut();
-        let mut i1 = SIZE;
+//         let mut iter = list.iter_mut();
+//         let mut i1 = SIZE;
 
 
-        assert_eq!(i1, iter.len());
+//         assert_eq!(i1, iter.len());
 
-        while let Some(_) = iter.next() {
-            i1 = i1 - 1;
+//         while let Some(_) = iter.next() {
+//             i1 = i1 - 1;
         
-            assert_eq!(i1, iter.len());
-        }
-        assert_eq!(0, iter.len());
-    }
+//             assert_eq!(i1, iter.len());
+//         }
+//         assert_eq!(0, iter.len());
+//     }
 
-    #[test]
-    fn update_val(){
-        todo!()
-    }
-}
+//     #[test]
+//     fn update_val(){
+//         todo!()
+//     }
+// }
 
 mod display{
     use crate::list::List;

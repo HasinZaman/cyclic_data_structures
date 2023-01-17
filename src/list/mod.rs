@@ -511,10 +511,10 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         Iter::new(self)
     }
 
-    /// Creates a iterator object over the list. In which, each element in the iterator can be updated.
-    pub fn iter_mut(&mut self) -> Iter<SIZE, T, WRITE_OVER> where Self: Sized {
-        Iter::new(self)
-    }
+    // /// Creates a iterator object over the list. In which, each element in the iterator can be updated.
+    // pub fn iter_mut(&mut self) -> Iter<SIZE, T, WRITE_OVER> where Self: Sized {
+    //     Iter::new(self)
+    // }
 
 }
 

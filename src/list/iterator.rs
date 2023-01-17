@@ -49,3 +49,41 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> DoubleEndedIterator for I
         }
     }
 }
+
+// pub struct IterMut<'a, const SIZE: usize, T, const WRITE_OVER: bool> {
+//     pointer: usize,
+//     list: &'a mut List<SIZE, T, WRITE_OVER>,
+// }
+
+// impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> IterMut<'a, SIZE, T, WRITE_OVER> {
+//     pub fn new(list: &'a mut List<SIZE, T, WRITE_OVER>) -> Self {
+//         Self {
+//             pointer: 0,
+//             list: list
+//         }
+//     }
+// }
+
+// impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> Iterator for IterMut<'a, SIZE, T, WRITE_OVER> {
+//     type Item = &'a mut T;
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         if self.len() <= 0{
+//             return None;
+//         }
+
+        
+
+//         let tmp = Some(&mut self.list[self.pointer]);
+
+//         self.pointer+=1;
+
+//         tmp
+//     }
+// }
+
+// impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> ExactSizeIterator for IterMut<'a, SIZE, T, WRITE_OVER> {
+//     fn len(&self) -> usize {
+//         self.list.len() - self.pointer
+//     }
+// }
