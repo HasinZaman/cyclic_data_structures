@@ -2,16 +2,13 @@
 #![deny(missing_doc_code_examples)]
 #![doc(html_playground_url = "https://playground.example.com/")]
 
-//#![doc = include_str!("../README.md")]
+#![doc = include_str!("../README.md")]
 
 use std::{array, mem::{MaybeUninit, self}, ptr, ops::{Index, IndexMut}, fmt::{Display, Debug}};
 
-use crate::error::Error;
-
 pub mod list;
 pub mod stack;
-// pub mod queue;
-// pub mod double_queue;
+pub mod queue;
 
 
 pub mod error;
