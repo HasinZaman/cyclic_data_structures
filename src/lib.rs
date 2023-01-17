@@ -2,7 +2,11 @@
 #![deny(missing_doc_code_examples)]
 #![doc(html_playground_url = "https://playground.example.com/")]
 
+<<<<<<< Updated upstream
 #![doc = include_str!("./../README.md")]
+=======
+#![doc = include_str!("../README.md")]
+>>>>>>> Stashed changes
 
 use std::{array, mem::{MaybeUninit, self}, ptr, ops::{Index, IndexMut}, fmt::{Display, Debug}};
 
