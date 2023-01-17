@@ -37,18 +37,18 @@ impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> ExactSizeIterator for Ite
     }
 }
 
-impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> DoubleEndedIterator for Iter<'a, SIZE, T, WRITE_OVER> {
-    fn next_back(&mut self) -> Option<Self::Item> {
-        match self.pointer.checked_sub(1) {
-            Some(val) => {
-                self.pointer = val;
+// impl<'a, const SIZE: usize, T, const WRITE_OVER: bool> DoubleEndedIterator for Iter<'a, SIZE, T, WRITE_OVER> {
+//     fn next_back(&mut self) -> Option<Self::Item> {
+//         match self.pointer.checked_sub(1) {
+//             Some(val) => {
+//                 self.pointer = val;
 
-                Some(&self.list[self.pointer])
-            },
-            None => None,
-        }
-    }
-}
+//                 Some(&self.list[self.pointer])
+//             },
+//             None => None,
+//         }
+//     }
+// }
 
 // pub struct IterMut<'a, const SIZE: usize, T, const WRITE_OVER: bool> {
 //     pointer: usize,
