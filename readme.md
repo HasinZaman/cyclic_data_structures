@@ -24,3 +24,8 @@ The stack module contains a series of structs to create stacks and their utility
 
 It is recommended to use [`Vec`] over [`Stack`] for most applications. As [`Vec`] has better - if not similar performance to the [`Stack`]. It is therefore, [`Stack`] should only be used when the stack should strictly be limited to a given size and or life convince of life features provided by the [`Stack`].
 
+### Queue
+
+The queue module contains a series of structs to create queues and their utility functionalities using cyclic lists.
+
+As a result, the queue inherits the O(1) insertion and deletion for enqueuing & dequeuing.
