@@ -101,7 +101,7 @@ mod tests;
 pub struct Stack<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>);
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> Stack<SIZE, T, WRITE_OVER> {
-    /// Returns the number of elements in the list.
+    /// Returns the number of elements in the stack.
     /// 
     /// ```
     /// # use cyclic_data_types::stack::Stack;
