@@ -1,7 +1,7 @@
 use criterion::{black_box, Criterion};
 use cyclic_data_types::list::List;
 use std::collections::linked_list::LinkedList;
-use ringbuffer::{AllocRingBuffer, RingBufferExt, RingBufferWrite};
+use ringbuffer::{AllocRingBuffer, RingBufferWrite};
 use smallvec::SmallVec;
 use circular_queue::CircularQueue;
 use arraydeque::{ArrayDeque, Wrapping};
