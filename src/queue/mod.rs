@@ -2,27 +2,83 @@ use std::{fmt::{Display, Debug}, collections::LinkedList, ops::{DerefMut, Deref}
 
 use crate::{list::List, error::Error};
 
+#[derive(Default, PartialEq)]
 pub struct Queue<const SIZE: usize, T, const WRITE_OVER: bool> (List<SIZE, T, WRITE_OVER>);
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> Queue<SIZE, T, WRITE_OVER> {
+    /// Returns the number of elements in the queue.
+    /// 
+    /// ```
+    /// # use cyclic_data_types::queue::Queue;
+    /// # const SIZE: usize = 5;
+    /// let mut queue: Queue<SIZE, i64, false> = Queue::default();
+    /// 
+    /// assert_eq!(queue.len(), 0);
+    /// 
+    /// assert!(queue.enqueue(1).is_ok());
+    /// 
+    /// assert_eq!(queue.len(), 1);
+    /// ```
     pub fn len(&self) -> usize {
         self.0.len()
     }
+
+    ///  Pushes an element to the end of the queue.
+    /// 
+    /// ```
+    /// # use cyclic_data_types::queue::Queue;
+    /// # const SIZE: usize = 5;
+    /// 
+    /// let mut queue: Queue<SIZE, i64, false> = Queue::default();
+    /// 
+    /// assert!(queue.enqueue(1).is_ok());
+    /// 
+    /// assert!(queue.enqueue(2).is_ok());
+    /// 
+    /// # assert_eq!(queue.len(), 2);
+    /// ```
     pub fn enqueue(&mut self, elem: T) -> Result<&mut Self, Error> {
         match self.0.push_back(elem) {
             Ok(_) => Ok(self),
             Err(err) => Err(err),
         }
     }
-
-    pub fn peek(&mut self, elem: T) -> Option<&T> {
+    /// Returns a reference to the first element in the queue.
+    /// 
+    /// ```
+    /// # use cyclic_data_types::queue::Queue;
+    /// # const SIZE: usize = 5;
+    /// 
+    /// let mut queue: Queue<SIZE, i64, false> = vec![1,2,3].try_into().unwrap();
+    /// 
+    /// # assert_eq!(queue.len(), 3);
+    /// assert_eq!(queue.peek(), Some(&1));
+    /// ```
+    pub fn peek(&mut self) -> Option<&T> {
         if self.0.len() == 0 {
             return None;
         }
         Some(&self.0[0usize])
     }
 
-    pub fn dequeue(&mut self, elem: T) -> Option<T> {
+    /// Returns the first element of the queue - after removing said element from the queue.
+    /// 
+    /// ```
+    /// # use cyclic_data_types::queue::Queue;
+    /// # const SIZE: usize = 5;
+    /// 
+    /// let mut queue: Queue<SIZE, i64, false> = vec![1,2,3].try_into().unwrap();
+    /// 
+    /// # assert_eq!(queue.len(), 3);
+    /// assert_eq!(queue.dequeue(), Some(1));
+    /// # assert_eq!(queue.len(), 2);
+    /// assert_eq!(queue.dequeue(), Some(2));
+    /// # assert_eq!(queue.len(), 1);
+    /// assert_eq!(queue.dequeue(), Some(3));
+    /// # assert_eq!(queue.len(), 0);
+    /// assert_eq!(queue.dequeue(), None);
+    /// ```
+    pub fn dequeue(&mut self) -> Option<T> {
         self.0.remove_front()
     }
 }
