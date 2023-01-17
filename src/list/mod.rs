@@ -347,7 +347,6 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         self.list.get_unchecked(index)
     }
     
-
     /// returns a mutable reference to an element in the list at provided index.
     /// 
     /// The get_mut element retrieval works similarly to a cyclic list and python lists. Where, the list loop backs to the beginning of the list when the index is greater than the size of the list; and the list can be accessed from the end of the list using negative integers.
@@ -429,7 +428,6 @@ impl<const SIZE: usize, T, const WRITE_OVER: bool> List<SIZE, T, WRITE_OVER> {
         self.list.get_unchecked_mut(index)
     }
     
-
     /// Removes the last element from the list and returns removed element. This occurs in `O(1)`
     ///
     /// ```
