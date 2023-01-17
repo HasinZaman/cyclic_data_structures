@@ -1,7 +1,6 @@
 use criterion::{black_box, Criterion};
 use cyclic_data_types::list::List;
 use std::collections::linked_list::LinkedList;
-use ringbuffer::{RingBuffer, RingBufferExt, RingBufferWrite};
 use smallvec::SmallVec;
 
 use arraydeque::{ArrayDeque, Wrapping};
