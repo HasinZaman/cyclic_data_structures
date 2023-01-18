@@ -1,11 +1,10 @@
-
 mod display {
     use crate::queue::Queue;
 
     const SIZE: usize = 5;
 
     #[test]
-    fn empty(){
+    fn empty() {
         let list: Queue<SIZE, i64, false> = Queue::default();
 
         let actual = list.to_string();
@@ -13,7 +12,7 @@ mod display {
         assert_eq!(actual, "[]");
     }
     #[test]
-    fn one_element(){
+    fn one_element() {
         let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1]).unwrap();
 
         let actual = list.to_string();
@@ -22,8 +21,8 @@ mod display {
     }
 
     #[test]
-    fn partially_filled(){
-        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1,2,3]).unwrap();
+    fn partially_filled() {
+        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1, 2, 3]).unwrap();
 
         let actual = list.to_string();
 
@@ -31,8 +30,8 @@ mod display {
     }
 
     #[test]
-    fn filled(){
-        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1,2,3,4,5]).unwrap();
+    fn filled() {
+        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1, 2, 3, 4, 5]).unwrap();
 
         let actual = list.to_string();
 
@@ -40,8 +39,8 @@ mod display {
     }
 
     #[test]
-    fn overflow(){
-        let list: Queue<SIZE, i64, true> = Queue::try_from(vec![1,2,3,4,5, 6]).unwrap();
+    fn overflow() {
+        let list: Queue<SIZE, i64, true> = Queue::try_from(vec![1, 2, 3, 4, 5, 6]).unwrap();
 
         let actual = list.to_string();
 
@@ -55,7 +54,7 @@ mod debug {
     const SIZE: usize = 5;
 
     #[test]
-    fn empty(){
+    fn empty() {
         let list: Queue<SIZE, i64, false> = Queue::default();
 
         let actual = format!("{list:?}");
@@ -64,8 +63,8 @@ mod debug {
     }
 
     #[test]
-    fn partially_filled(){
-        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1,2,3]).unwrap();
+    fn partially_filled() {
+        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1, 2, 3]).unwrap();
 
         let actual = format!("{list:?}");
 
@@ -73,8 +72,8 @@ mod debug {
     }
 
     #[test]
-    fn filled(){
-        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1,2,3,4,5]).unwrap();
+    fn filled() {
+        let list: Queue<SIZE, i64, false> = Queue::try_from(vec![1, 2, 3, 4, 5]).unwrap();
 
         let actual = format!("{list:?}");
 
@@ -82,8 +81,8 @@ mod debug {
     }
 
     #[test]
-    fn overflow(){
-        let mut list: Queue<SIZE, i64, true> = Queue::try_from(vec![1,2,3,4,5]).unwrap();
+    fn overflow() {
+        let mut list: Queue<SIZE, i64, true> = Queue::try_from(vec![1, 2, 3, 4, 5]).unwrap();
 
         assert!(list.enqueue(6).is_ok());
         let actual = format!("{list:?}");

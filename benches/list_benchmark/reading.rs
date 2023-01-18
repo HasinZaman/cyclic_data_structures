@@ -1,11 +1,10 @@
-use criterion::{black_box, Criterion};
-use cyclic_data_types::list::List;
-use std::collections::linked_list::LinkedList;
-use smallvec::SmallVec;
 use arraydeque::{ArrayDeque, Wrapping};
 use arrayvec::ArrayVec;
+use criterion::{black_box, Criterion};
+use cyclic_data_types::list::List;
 use ring_queue::Ring;
-
+use smallvec::SmallVec;
+use std::collections::linked_list::LinkedList;
 
 macro_rules! list_reading_benchmark{
     ($SIZE: literal, $c: expr, $small_vec: literal) => {
@@ -660,7 +659,7 @@ macro_rules! list_reading_benchmark{
 
             }
         );
-        
+
         $c.bench_function(
             &format!("vec (get) (back-front) - reading {}", $SIZE),
             |b| {
@@ -734,7 +733,7 @@ macro_rules! list_reading_benchmark{
 
             }
         );
-        
+
         //linked list
         $c.bench_function(
             &format!("linked_list (iter) (front-back) - reading {}", $SIZE),
@@ -809,7 +808,7 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        
+
         $c.bench_function(
             &format!("small vec (unchecked_get) (front-back) - reading {}", $SIZE),
             |b| {
@@ -844,7 +843,7 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        
+
         $c.bench_function(
             &format!("small vec (index) (front-back) - reading {}", $SIZE),
             |b| {
@@ -879,7 +878,7 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        
+
         $c.bench_function(
             &format!("small vec (iter) (front-back) - reading {}", $SIZE),
             |b| {
@@ -1033,7 +1032,7 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        
+
         $c.bench_function(
             &format!("array deque (get) (front-back) - reading {}", $SIZE),
             |b| {
@@ -1070,7 +1069,7 @@ macro_rules! list_reading_benchmark{
                 )
             }
         );
-        
+
         $c.bench_function(
             &format!("array deque (index) (front-back) - reading {}", $SIZE),
             |b| {
@@ -1108,7 +1107,7 @@ macro_rules! list_reading_benchmark{
             }
         );
     }
-    
+
 }
 pub fn list_reading_benchmark(c: &mut Criterion) {
     list_reading_benchmark!(8usize, c, 8, 10);

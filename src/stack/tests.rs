@@ -7,24 +7,24 @@ mod len {
 
     #[test]
     fn empty() {
-        let list: Stack<SIZE, i64, false>  = Stack::default();
+        let list: Stack<SIZE, i64, false> = Stack::default();
 
         assert_eq!(list.len(), 0);
     }
-    
+
     #[test]
     fn partial_size_push() {
-        let mut list: Stack<SIZE, i64, false>  = Stack::default();
+        let mut list: Stack<SIZE, i64, false> = Stack::default();
 
         for i in 0..5 {
             assert!(list.push(i).is_ok());
             assert_eq!(list.len(), (i + 1) as usize);
         }
     }
-    
+
     #[test]
     fn overflow_push() {
-        let mut list: Stack<SIZE, i64, true>  = Stack::default();
+        let mut list: Stack<SIZE, i64, true> = Stack::default();
 
         for i in 0..10 {
             assert!(list.push(i).is_ok());
@@ -35,12 +35,12 @@ mod len {
 }
 
 mod push {
-    use crate::{stack::Stack, error::Error, list::List};
+    use crate::{error::Error, list::List, stack::Stack};
 
     const SIZE: usize = 5;
 
     #[test]
-    fn empty(){
+    fn empty() {
         let mut list: Stack<SIZE, i64, false> = Stack::default();
 
         let expect = vec![].try_into().unwrap();
@@ -52,14 +52,14 @@ mod push {
     }
 
     #[test]
-    fn fill(){
+    fn fill() {
         let mut list: Stack<SIZE, i64, false> = Stack::default();
 
         let expect = vec![].try_into().unwrap();
         assert_eq!(list, expect);
 
         assert!(list.push(1).is_ok());
-        let expect =  vec![1].try_into().unwrap();
+        let expect = vec![1].try_into().unwrap();
         assert_eq!(list, expect);
 
         assert!(list.push(2).is_ok());
@@ -67,9 +67,9 @@ mod push {
         assert_eq!(list, expect);
 
         assert!(list.push(3).is_ok());
-        let expect = vec![1,2,3].try_into().unwrap();
+        let expect = vec![1, 2, 3].try_into().unwrap();
         assert_eq!(list, expect);
-        
+
         assert!(list.push(4).is_ok());
         let expect = vec![1, 2, 3, 4].try_into().unwrap();
         assert_eq!(list, expect);
@@ -80,32 +80,27 @@ mod push {
     }
 
     #[test]
-    fn overflow(){
+    fn overflow() {
         let mut stack: Stack<SIZE, i64, true> = Stack::default();
-        
-        
+
         assert!(stack.push(1).is_ok());
 
-        
         assert!(stack.push(2).is_ok());
 
-        
         assert!(stack.push(3).is_ok());
 
-        
         assert!(stack.push(4).is_ok());
 
-        
         assert!(stack.push(5).is_ok());
 
         assert!(stack.push(6).is_ok());
-        let expect = [2,3,4,5,6].try_into().unwrap();
+        let expect = [2, 3, 4, 5, 6].try_into().unwrap();
         assert_eq!(stack, expect);
     }
 
     #[test]
-    fn no_overflow(){
-        let mut list: List<SIZE, i64, false> = vec![1,2,3,4,5].try_into().unwrap();
+    fn no_overflow() {
+        let mut list: List<SIZE, i64, false> = vec![1, 2, 3, 4, 5].try_into().unwrap();
 
         assert_eq!(Err(Error::Overflow), list.push_back(10 as i64));
     }
@@ -125,21 +120,21 @@ mod peek {
 
     #[test]
     fn partially_filled() {
-        let stack: Stack<SIZE, i64, false> = vec![1,2,3].try_into().unwrap();
+        let stack: Stack<SIZE, i64, false> = vec![1, 2, 3].try_into().unwrap();
 
         assert_eq!(stack.peek(), Some(&3));
     }
 
     #[test]
     fn filled() {
-        let stack: Stack<SIZE, i64, false> = vec![1,2,3,4,5].try_into().unwrap();
+        let stack: Stack<SIZE, i64, false> = vec![1, 2, 3, 4, 5].try_into().unwrap();
 
         assert_eq!(stack.peek(), Some(&5));
     }
 
     #[test]
     fn overflow() {
-        let mut stack: Stack<SIZE, i64, true> = vec![1,2,3,4,5].try_into().unwrap();
+        let mut stack: Stack<SIZE, i64, true> = vec![1, 2, 3, 4, 5].try_into().unwrap();
 
         assert!(stack.push(6).is_ok());
 
@@ -161,21 +156,21 @@ mod pop {
 
     #[test]
     fn partially_filled() {
-        let mut stack: Stack<SIZE, i64, false> = vec![1,2,3].try_into().unwrap();
+        let mut stack: Stack<SIZE, i64, false> = vec![1, 2, 3].try_into().unwrap();
 
         assert_eq!(stack.pop(), Some(3));
     }
 
     #[test]
     fn filled() {
-        let mut stack: Stack<SIZE, i64, false> = vec![1,2,3,4,5].try_into().unwrap();
+        let mut stack: Stack<SIZE, i64, false> = vec![1, 2, 3, 4, 5].try_into().unwrap();
 
         assert_eq!(stack.pop(), Some(5));
     }
 
     #[test]
     fn overflow() {
-        let mut stack: Stack<SIZE, i64, true> = vec![1,2,3,4,5].try_into().unwrap();
+        let mut stack: Stack<SIZE, i64, true> = vec![1, 2, 3, 4, 5].try_into().unwrap();
 
         assert!(stack.push(6).is_ok());
 
@@ -184,7 +179,7 @@ mod pop {
 }
 
 mod read {
-    use crate::{stack::Stack, error::Error};
+    use crate::{error::Error, stack::Stack};
 
     const SIZE: usize = 5;
     #[test]
@@ -198,7 +193,7 @@ mod read {
 
     #[test]
     fn partially_filled() {
-        let stack: Stack<SIZE, i64, false> = vec![1,2,3].try_into().unwrap();
+        let stack: Stack<SIZE, i64, false> = vec![1, 2, 3].try_into().unwrap();
 
         assert_eq!(Ok(&3), stack.read(0));
         assert_eq!(Ok(&2), stack.read(1));
@@ -208,7 +203,7 @@ mod read {
 
     #[test]
     fn filled() {
-        let stack: Stack<SIZE, i64, false> = vec![1,2,3,4,5].try_into().unwrap();
+        let stack: Stack<SIZE, i64, false> = vec![1, 2, 3, 4, 5].try_into().unwrap();
 
         assert_eq!(Ok(&5), stack.read(0));
         assert_eq!(Ok(&4), stack.read(1));
@@ -221,7 +216,7 @@ mod read {
 
     #[test]
     fn overflow() {
-        let mut stack: Stack<SIZE, i64, true> = vec![1,2,3,4,5].try_into().unwrap();
+        let mut stack: Stack<SIZE, i64, true> = vec![1, 2, 3, 4, 5].try_into().unwrap();
 
         assert!(stack.push(6).is_ok());
 
@@ -230,7 +225,7 @@ mod read {
         assert_eq!(Ok(&4), stack.read(2));
         assert_eq!(Ok(&3), stack.read(3));
         assert_eq!(Ok(&2), stack.read(4));
-        
+
         assert_eq!(Err(Error::IndexOutOfRange), stack.read(5));
     }
 }
@@ -241,7 +236,7 @@ mod display {
     const SIZE: usize = 5;
 
     #[test]
-    fn empty(){
+    fn empty() {
         let list: Stack<SIZE, i64, false> = Stack::default();
 
         let actual = list.to_string();
@@ -249,7 +244,7 @@ mod display {
         assert_eq!(actual, "[]");
     }
     #[test]
-    fn one_element(){
+    fn one_element() {
         let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1]).unwrap();
 
         let actual = list.to_string();
@@ -258,8 +253,8 @@ mod display {
     }
 
     #[test]
-    fn partially_filled(){
-        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1,2,3]).unwrap();
+    fn partially_filled() {
+        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1, 2, 3]).unwrap();
 
         let actual = list.to_string();
 
@@ -267,8 +262,8 @@ mod display {
     }
 
     #[test]
-    fn filled(){
-        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1,2,3,4,5]).unwrap();
+    fn filled() {
+        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1, 2, 3, 4, 5]).unwrap();
 
         let actual = list.to_string();
 
@@ -276,8 +271,8 @@ mod display {
     }
 
     #[test]
-    fn overflow(){
-        let list: Stack<SIZE, i64, true> = Stack::try_from(vec![1,2,3,4,5, 6]).unwrap();
+    fn overflow() {
+        let list: Stack<SIZE, i64, true> = Stack::try_from(vec![1, 2, 3, 4, 5, 6]).unwrap();
 
         let actual = list.to_string();
 
@@ -291,7 +286,7 @@ mod debug {
     const SIZE: usize = 5;
 
     #[test]
-    fn empty(){
+    fn empty() {
         let list: Stack<SIZE, i64, false> = Stack::default();
 
         let actual = format!("{list:?}");
@@ -300,8 +295,8 @@ mod debug {
     }
 
     #[test]
-    fn partially_filled(){
-        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1,2,3]).unwrap();
+    fn partially_filled() {
+        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1, 2, 3]).unwrap();
 
         let actual = format!("{list:?}");
 
@@ -309,8 +304,8 @@ mod debug {
     }
 
     #[test]
-    fn filled(){
-        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1,2,3,4,5]).unwrap();
+    fn filled() {
+        let list: Stack<SIZE, i64, false> = Stack::try_from(vec![1, 2, 3, 4, 5]).unwrap();
 
         let actual = format!("{list:?}");
 
@@ -318,8 +313,8 @@ mod debug {
     }
 
     #[test]
-    fn overflow(){
-        let mut list: Stack<SIZE, i64, true> = Stack::try_from(vec![1,2,3,4,5]).unwrap();
+    fn overflow() {
+        let mut list: Stack<SIZE, i64, true> = Stack::try_from(vec![1, 2, 3, 4, 5]).unwrap();
 
         assert!(list.push(6).is_ok());
         let actual = format!("{list:?}");

@@ -1,12 +1,11 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 
-mod generation;
-mod drop_front;
 mod drop_back;
+mod drop_front;
+mod generation;
 mod reading;
 
-
-criterion_group!{
+criterion_group! {
     name = benches;
     config = Criterion::default()
         .sample_size(100);
