@@ -1,6 +1,6 @@
 [package]
 name = "cyclic_data_types"
-version = "0.2.2"
+version = "0.2.2.1"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/HasinZaman/cyclic_data_structures"
