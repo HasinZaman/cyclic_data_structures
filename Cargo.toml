@@ -3,6 +3,7 @@ name = "cyclic_data_types"
 version = "0.2.2"
 edition = "2021"
 license = "MIT"
+repository = "https://github.com/HasinZaman/cyclic_data_structures"
 description = "Cyclic data types are series of structs, enums, types and functions to create a series of fast data types."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
