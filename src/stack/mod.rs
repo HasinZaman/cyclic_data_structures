@@ -254,8 +254,6 @@ where
 
 impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> FromIterator<T>
     for Stack<STACK_SIZE, T, WRITE_OVER>
-where
-    T: Default,
 {
     fn from_iter<A: IntoIterator<Item = T>>(iter: A) -> Self {
         Stack(iter.into_iter().collect())

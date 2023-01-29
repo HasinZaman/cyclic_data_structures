@@ -158,10 +158,7 @@ where
     }
 }
 
-impl<const SIZE: usize, T, const WRITE_OVER: bool> Default for CyclicList<SIZE, T, WRITE_OVER>
-where
-    T: Default,
-{
+impl<const SIZE: usize, T, const WRITE_OVER: bool> Default for CyclicList<SIZE, T, WRITE_OVER> {
     fn default() -> Self {
         let list: [Option<T>; SIZE] = array::from_fn(|_| None);
 

@@ -113,7 +113,7 @@ mod tests;
 /// ```
 ///
 /// [note]: [Generic Constraints](https://rust-lang.github.io/rfcs/2000-const-generics.html)
-#[derive(Eq, PartialEq, Default)]
+#[derive(Eq, PartialEq)]
 pub struct List<const SIZE: usize, T: Sized, const WRITE_OVER: bool> {
     list: CyclicList<SIZE, T, WRITE_OVER>,
 }
@@ -639,8 +639,6 @@ where
 
 impl<const LIST_SIZE: usize, T, const WRITE_OVER: bool> FromIterator<T>
     for List<LIST_SIZE, T, WRITE_OVER>
-where
-    T: Default,
 {
     fn from_iter<A: IntoIterator<Item = T>>(iter: A) -> Self {
         let mut list: List<LIST_SIZE, T, WRITE_OVER> = List::default();
@@ -695,5 +693,10 @@ impl<const LIST_SIZE: usize, T> From<List<LIST_SIZE, T, false>> for List<LIST_SI
         Self {
             list: value.list.into(),
         }
+    }
+}
+impl<const SIZE: usize, T, const WRITE_OVER: bool>Default for List<SIZE, T, WRITE_OVER> {
+    fn default() -> Self {
+        Self { list: Default::default() }
     }
 }

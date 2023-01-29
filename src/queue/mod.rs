@@ -237,8 +237,6 @@ where
 
 impl<const QUEUE_SIZE: usize, T, const WRITE_OVER: bool> FromIterator<T>
     for Queue<QUEUE_SIZE, T, WRITE_OVER>
-where
-    T: Default,
 {
     fn from_iter<A: IntoIterator<Item = T>>(iter: A) -> Self {
         Queue(iter.into_iter().collect())
