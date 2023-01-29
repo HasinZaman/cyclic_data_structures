@@ -697,6 +697,6 @@ impl<const LIST_SIZE: usize, T> From<List<LIST_SIZE, T, false>> for List<LIST_SI
 }
 impl<const SIZE: usize, T, const WRITE_OVER: bool>Default for List<SIZE, T, WRITE_OVER> {
     fn default() -> Self {
-        Self { list: Default::default() }
+        Self { list: CyclicList::default() }
     }
 }

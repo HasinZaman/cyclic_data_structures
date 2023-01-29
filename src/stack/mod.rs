@@ -326,6 +326,6 @@ impl<const STACK_SIZE: usize, T, const WRITE_OVER: bool> DerefMut
 
 impl<const QUEUE_SIZE: usize, T, const WRITE_OVER: bool> Default for Stack<QUEUE_SIZE, T, WRITE_OVER> {
     fn default() -> Self {
-        Self(Default::default())
+        Self(List::default())
     }
 }
