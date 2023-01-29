@@ -102,7 +102,7 @@ mod tests;
 ///
 /// WRITE_OVER is a generic constant [^note] that is used to determine if elements should be over written on overflow
 /// [note]: [Generic Constraints](https://rust-lang.github.io/rfcs/2000-const-generics.html)
-#[derive(Default, PartialEq)]
+#[derive(PartialEq)]
 pub struct Queue<const SIZE: usize, T, const WRITE_OVER: bool>(List<SIZE, T, WRITE_OVER>);
 
 impl<const SIZE: usize, T, const WRITE_OVER: bool> Queue<SIZE, T, WRITE_OVER> {
@@ -304,5 +304,11 @@ impl<const QUEUE_SIZE: usize, T, const WRITE_OVER: bool> DerefMut
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl<const QUEUE_SIZE: usize, T, const WRITE_OVER: bool> Default for Queue<QUEUE_SIZE, T, WRITE_OVER> {
+    fn default() -> Self {
+        Self(Default::default())
     }
 }
