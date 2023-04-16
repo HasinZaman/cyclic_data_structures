@@ -1,7 +1,7 @@
 #![warn(missing_docs)]
 #![deny(missing_doc_code_examples)]
 #![doc(html_playground_url = "https://playground.example.com/")]
-//#![doc = include_str!("../README.md")]
+#![doc = include_str!("../README.md")]
 
 use std::{
     array,
